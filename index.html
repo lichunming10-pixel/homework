@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (備份版)</title>
+    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (全動態版)</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -254,6 +254,16 @@
             display: none;
             margin-top: 15px;
         }
+        
+        .manage-class-box {
+            display: flex; 
+            gap: 10px; 
+            background: #e9ecef; 
+            padding: 10px; 
+            border-radius: 4px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -261,47 +271,49 @@
 <div class="container">
     <header>
         <h1>🏫 聖公會蔡功譜中學</h1>
-        <h2>📝 學生欠交功課統計系統 (本地備份版)</h2>
-        <p>無伺服器、保密性高、支援一鍵手動備份與跨設備導入</p>
+        <h2>📝 學生欠交功課統計系統 (全動態版)</h2>
+        <p>自訂班別與名單、無伺服器保密、支援一鍵備份與匯出</p>
     </header>
 
     <!-- 自動清理通知欄 -->
     <div id="cleanAlert" class="clean-alert">
-        ⚠️ <strong>系統通知：</strong> 為了保持瀏覽順暢，系統已自動為您清除 <span id="cleanedCount">0</span> 筆過期的本地記錄！
+        ⚠️ <strong>系統通知：</strong> 系統已自動為您清除 <span id="cleanedCount">0</span> 筆過期的本地記錄！
     </div>
 
-    <!-- 頂部按鈕：控制展開「學生名單設定」 -->
+    <!-- 頂部按鈕：控制展開「班別與名單管理」 -->
     <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-        <button id="toggleRosterBtn" class="btn-toggle">⚙️ 設定各班本地學生名冊</button>
+        <button id="toggleRosterBtn" class="btn-toggle">⚙️ 管理班別與學生名冊</button>
     </div>
 
-    <!-- 學生名單管理區塊 -->
+    <!-- 班別與學生名單管理區塊 -->
     <div id="rosterCard" class="card roster-card">
-        <h3>👥 設定各班學生名冊</h3>
-        <p style="font-size: 14px; color: #666;">請先選擇班別，再貼上該班學生姓名（<strong>每行輸入一位學生姓名</strong>，可以直接從 Excel 複製貼上）：</p>
+        <h3>👥 班別與學生名冊管理</h3>
+        
+        <!-- 新增班別區塊 -->
+        <div class="manage-class-box">
+            <strong style="white-space: nowrap;">✨ 新增班別：</strong>
+            <input type="text" id="newClassInput" placeholder="例如：4A" style="width: 150px; padding: 6px;">
+            <button id="addClassBtn" style="width: auto; padding: 6px 15px; background: #28a745;">加入</button>
+        </div>
+
+        <p style="font-size: 14px; color: #666; margin-top: 10px;">請選擇班別以「編輯學生名單」或「刪除該班別」：</p>
         
         <div class="form-row">
             <div class="form-group" style="flex: 1;">
-                <label for="rosterClassSelect">選擇要設定的班別</label>
+                <label for="rosterClassSelect">選擇班別</label>
                 <select id="rosterClassSelect">
-                    <option value="1A">1A</option>
-                    <option value="1B">1B</option>
-                    <option value="1C">1C</option>
-                    <option value="2A">2A</option>
-                    <option value="2B">2B</option>
-                    <option value="2C">2C</option>
-                    <option value="3A">3A</option>
-                    <option value="3B">3B</option>
-                    <option value="3C">3C</option>
+                    <!-- JavaScript 動態載入 -->
                 </select>
+                <button id="deleteClassBtn" class="btn-delete" style="margin-top: 10px; width: 100%;">🗑️ 刪除此班別</button>
             </div>
             <div class="form-group" style="flex: 3;">
-                <label for="rosterTextArea">貼上學生名單（每行一人）</label>
-                <textarea id="rosterTextArea" placeholder="陳大文&#10;張小明&#10;李美美"></textarea>
+                <label for="rosterTextArea">該班學生名單（每行一人）</label>
+                <textarea id="rosterTextArea" placeholder="請先在左側選擇班別，然後在此貼上名字..."></textarea>
             </div>
         </div>
-        <div style="display: flex; gap: 10px; justify-content: flex-end;">
-            <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">儲存該班名單</button>
+        
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+            <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">💾 儲存該班名單</button>
             <button id="closeRosterBtn" style="width: auto; background-color: #6c757d;">收起設定</button>
         </div>
     </div>
@@ -319,15 +331,7 @@
                     <label for="studentClass">班別</label>
                     <select id="studentClass" required>
                         <option value="" disabled selected>請選擇班別</option>
-                        <option value="1A">1A</option>
-                        <option value="1B">1B</option>
-                        <option value="1C">1C</option>
-                        <option value="2A">2A</option>
-                        <option value="2B">2B</option>
-                        <option value="2C">2C</option>
-                        <option value="3A">3A</option>
-                        <option value="3B">3B</option>
-                        <option value="3C">3C</option>
+                        <!-- JavaScript 動態載入 -->
                     </select>
                 </div>
             </div>
@@ -351,21 +355,12 @@
     <div class="card">
         <h3>📋 欠交功課列表</h3>
 
-        <!-- 控制區塊 -->
         <div class="filter-section">
             <div class="filter-group">
                 <label for="classFilter">🔍 班別：</label>
                 <select id="classFilter">
                     <option value="ALL">顯示所有班別</option>
-                    <option value="1A">1A</option>
-                    <option value="1B">1B</option>
-                    <option value="1C">1C</option>
-                    <option value="2A">2A</option>
-                    <option value="2B">2B</option>
-                    <option value="2C">2C</option>
-                    <option value="3A">3A</option>
-                    <option value="3B">3B</option>
-                    <option value="3C">3C</option>
+                    <!-- JavaScript 動態載入 -->
                 </select>
             </div>
             <div class="filter-group">
@@ -389,7 +384,6 @@
                 <button id="exportBtn" class="btn-export">📥 匯出 Excel 報表</button>
                 <button id="exportBackupBtn" class="btn-backup">📤 導出數據備份</button>
                 <button id="importBackupBtn" class="btn-restore">📥 導入數據備份</button>
-                <!-- 隱藏的檔案輸入框用作導入備份 -->
                 <input type="file" id="fileInput" accept=".json" style="display: none;">
                 <button id="clearAllBtn" class="btn-delete" style="width: auto; padding: 5px 10px;">清除所有數據</button>
             </div>
@@ -442,18 +436,62 @@
     const rosterTextArea = document.getElementById('rosterTextArea');
     const saveRosterBtn = document.getElementById('saveRosterBtn');
     const closeRosterBtn = document.getElementById('closeRosterBtn');
+    const newClassInput = document.getElementById('newClassInput');
+    const addClassBtn = document.getElementById('addClassBtn');
+    const deleteClassBtn = document.getElementById('deleteClassBtn');
 
     // 設定預設日期為今天
     const today = new Date().toISOString().split('T')[0];
     recordDateInput.value = today;
 
-    // 從 localStorage 讀取數據、清理原則與學生名冊
+    // 從 localStorage 讀取核心資料
     let records = JSON.parse(localStorage.getItem('homeworkRecords')) || [];
     let savedPolicy = localStorage.getItem('homeworkCleanPolicy') || "30";
     cleanPolicy.value = savedPolicy;
     let studentRosters = JSON.parse(localStorage.getItem('studentRosters')) || {};
+    
+    // 預設班別列表 (若無資料則提供預設)
+    let classList = JSON.parse(localStorage.getItem('homeworkClasses')) || ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
 
-    // --- 名冊管理邏輯 ---
+    // ==========================================
+    // 🏫 動態班別渲染邏輯
+    // ==========================================
+    function renderClassDropdowns() {
+        // 1. 登記表單的班別
+        let recordClassHtml = '<option value="" disabled selected>請選擇班別</option>';
+        classList.forEach(cls => { recordClassHtml += `<option value="${cls}">${cls}</option>`; });
+        
+        // 為了避免重新渲染時遺失已選的選項
+        const currentRecordClass = studentClassInput.value;
+        studentClassInput.innerHTML = recordClassHtml;
+        if (classList.includes(currentRecordClass)) studentClassInput.value = currentRecordClass;
+
+        // 2. 篩選器的班別
+        let filterClassHtml = '<option value="ALL">顯示所有班別</option>';
+        classList.forEach(cls => { filterClassHtml += `<option value="${cls}">${cls}</option>`; });
+        
+        const currentFilterClass = classFilter.value;
+        classFilter.innerHTML = filterClassHtml;
+        if (currentFilterClass === 'ALL' || classList.includes(currentFilterClass)) {
+            classFilter.value = currentFilterClass;
+        }
+
+        // 3. 設定區塊的班別
+        let rosterClassHtml = '';
+        if (classList.length === 0) {
+            rosterClassHtml = '<option value="" disabled selected>請先新增班別</option>';
+        } else {
+            classList.forEach(cls => { rosterClassHtml += `<option value="${cls}">${cls}</option>`; });
+        }
+        
+        const currentRosterClass = rosterClassSelect.value;
+        rosterClassSelect.innerHTML = rosterClassHtml;
+        if (classList.includes(currentRosterClass)) rosterClassSelect.value = currentRosterClass;
+    }
+
+    // ==========================================
+    // ⚙️ 管理班別與名單
+    // ==========================================
     toggleRosterBtn.addEventListener('click', () => {
         rosterCard.style.display = rosterCard.style.display === 'block' ? 'none' : 'block';
         loadRosterToTextarea();
@@ -463,16 +501,59 @@
         rosterCard.style.display = 'none';
     });
 
+    // 新增班別
+    addClassBtn.addEventListener('click', () => {
+        const newClass = newClassInput.value.trim().toUpperCase(); // 統一轉大寫，如 4a -> 4A
+        if (!newClass) return alert('請輸入班別名稱！');
+        if (classList.includes(newClass)) return alert('此班別已經存在！');
+        
+        classList.push(newClass);
+        // 自動排序一下會比較好看
+        classList.sort(); 
+        
+        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
+        newClassInput.value = '';
+        
+        renderClassDropdowns();
+        rosterClassSelect.value = newClass; // 自動跳轉到剛新增的班級
+        loadRosterToTextarea();
+        alert(`成功新增班別：${newClass}`);
+    });
+
+    // 刪除班別
+    deleteClassBtn.addEventListener('click', () => {
+        const targetClass = rosterClassSelect.value;
+        if (!targetClass) return;
+
+        if (confirm(`⚠️ 警告：確定要刪除「${targetClass}」班嗎？\n刪除後，該班的學生名單設定將被清除（但已登記的欠交記錄仍會保留）。`)) {
+            classList = classList.filter(cls => cls !== targetClass);
+            delete studentRosters[targetClass]; // 清除該班名單
+            
+            localStorage.setItem('homeworkClasses', JSON.stringify(classList));
+            localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
+            
+            renderClassDropdowns();
+            loadRosterToTextarea();
+            updateStudentDropdown();
+        }
+    });
+
     rosterClassSelect.addEventListener('change', loadRosterToTextarea);
 
     function loadRosterToTextarea() {
         const cls = rosterClassSelect.value;
+        if (!cls) {
+            rosterTextArea.value = '';
+            return;
+        }
         const list = studentRosters[cls] || [];
         rosterTextArea.value = list.join('\n');
     }
 
     saveRosterBtn.addEventListener('click', () => {
         const cls = rosterClassSelect.value;
+        if (!cls) return alert('請先選擇或新增一個班別！');
+        
         const text = rosterTextArea.value.trim();
         const list = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
         
@@ -508,7 +589,7 @@
         studentNameSelect.innerHTML = optionsHtml;
     }
 
-    // --- 數據統計與清理邏輯 ---
+    // --- 以下為數據統計、清理與渲染邏輯 ---
     function autoCleanRecords() {
         const policy = cleanPolicy.value;
         if (policy === 'NEVER') return;
@@ -595,17 +676,10 @@
 
     function escapeHtml(string) {
         return String(string).replace(/[&<>"']/g, function (s) {
-            return {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;'
-            }[s];
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
         });
     }
 
-    // 新增記錄
     recordForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -622,7 +696,6 @@
         
         studentNameSelect.value = '';
         homeworkItemInput.value = '';
-        
         renderTable();
     });
 
@@ -649,14 +722,12 @@
         }
     });
 
-    // 匯出 CSV Excel 報表
+    // 匯出 Excel
     exportBtn.addEventListener('click', function() {
         const filteredRecords = getFilteredRecords();
         if (filteredRecords.length === 0) return;
 
-        let csvContent = "\uFEFF"; 
-        csvContent += "登記日期,班別,學生姓名,欠交項目\n";
-
+        let csvContent = "\uFEFF登記日期,班別,學生姓名,欠交項目\n";
         filteredRecords.forEach(record => {
             const safeName = `"${record.name.replace(/"/g, '""')}"`;
             const safeItem = `"${record.item.replace(/"/g, '""')}"`;
@@ -666,7 +737,6 @@
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        
         const exportDate = new Date().toISOString().split('T')[0];
         const selectedClass = classFilter.value;
         const classNameSuffix = selectedClass === 'ALL' ? '所有班級' : `${selectedClass}班`;
@@ -674,19 +744,15 @@
         link.setAttribute("href", url);
         link.setAttribute("download", `欠交功課報表_${classNameSuffix}_${exportDate}.csv`);
         link.style.visibility = 'hidden';
-        
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     });
 
-    // ==========================================
-    // ⚙️ 新增功能：手動「備份與還原」導出/導入邏輯
-    // ==========================================
-    
-    // 1. 導出備份 (打包欠交記錄與學生名單)
+    // 導出備份 (打包班別、記錄與學生名單)
     exportBackupBtn.addEventListener('click', function() {
         const backupData = {
+            classes: classList,
             records: records,
             studentRosters: studentRosters,
             policy: cleanPolicy.value,
@@ -701,18 +767,15 @@
         link.setAttribute("href", url);
         link.setAttribute("download", `homework_backup_${exportDate}.json`);
         link.style.visibility = 'hidden';
-        
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     });
 
-    // 2. 觸發隱藏的檔案選擇器
     importBackupBtn.addEventListener('click', function() {
         fileInput.click();
     });
 
-    // 3. 讀取並導入備份檔案
     fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -722,13 +785,13 @@
             try {
                 const importedData = JSON.parse(e.target.result);
                 
-                // 驗證檔案結構是否合規
                 if (importedData.records && importedData.studentRosters) {
-                    if (confirm(`已偵測到備份檔案（備份時間：${importedData.backupTime || '未知'}）。\n這將會覆蓋您目前設備上的所有欠交數據及學生名冊，確定要導入嗎？`)) {
+                    if (confirm(`已偵測到備份檔案（備份時間：${importedData.backupTime || '未知'}）。\n這將會覆蓋您目前設備上的所有欠交數據、自訂班別及學生名冊，確定要導入嗎？`)) {
                         
                         // 覆蓋本地資料
                         records = importedData.records;
                         studentRosters = importedData.studentRosters;
+                        if (importedData.classes) classList = importedData.classes; // 恢復班別
                         if (importedData.policy) {
                             cleanPolicy.value = importedData.policy;
                             localStorage.setItem('homeworkCleanPolicy', importedData.policy);
@@ -737,11 +800,13 @@
                         // 儲存至本地瀏覽器
                         localStorage.setItem('homeworkRecords', JSON.stringify(records));
                         localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
+                        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
 
                         // 重新加載介面
+                        renderClassDropdowns();
                         updateStudentDropdown();
                         renderTable();
-                        alert('🎉 數據與學生名冊成功導入並同步！');
+                        alert('🎉 數據、自訂班別與學生名冊成功導入並同步！');
                     }
                 } else {
                     alert('❌ 導入失敗：此檔案非本系統專用的備份格式。');
@@ -749,16 +814,20 @@
             } catch (err) {
                 alert('❌ 導入失敗：無法解析該備份檔案。');
             }
-            // 清空選擇器以利下次重複導入同檔
             fileInput.value = '';
         };
         reader.readAsText(file);
     });
 
-    // 啟動流程
+    // 啟動流程：渲染班別選單 -> 清理舊資料 -> 渲染表格
+    renderClassDropdowns();
     autoCleanRecords();
     renderTable();
 </script>
+
+</body>
+</html>
+
 
 </body>
 </html>
