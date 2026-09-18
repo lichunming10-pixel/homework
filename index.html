@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (含排行榜版)</title>
+    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (即時修正版)</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -271,7 +271,7 @@
 <div class="container">
     <header>
         <h1>🏫 聖公會蔡功譜中學</h1>
-        <h2>📝 學生欠交功課統計系統 (含排行榜版)</h2>
+        <h2>📝 學生欠交功課統計系統 (修正優化版)</h2>
         <p>追蹤補交過程、統計排行榜、自訂班別名單與一鍵備份</p>
     </header>
 
@@ -529,7 +529,7 @@
         if (!rawString) return { id: "", name: "" };
         const trimmed = rawString.trim();
         const match = trimmed.match(/^(\d+)\s+(.+)$/);
-        if (match) return { id: match[1], name: match[2] };
+        if (match) return { id: match, name: match };
         return { id: "", name: trimmed };
     }
 
@@ -539,7 +539,12 @@
     function renderClassDropdowns() {
         let recordClassHtml = '<option value="" disabled selected>請選擇班別</option>';
         classList.forEach(cls => { recordClassHtml += `<option value="${cls}">${cls}</option>`; });
+        
+        const currentRecordClass = studentClassInput.value;
         studentClassInput.innerHTML = recordClassHtml;
+        if (classList.includes(currentRecordClass)) {
+            studentClassInput.value = currentRecordClass;
+        }
 
         let filterClassHtml = '<option value="ALL">顯示所有班別</option>';
         classList.forEach(cls => { filterClassHtml += `<option value="${cls}">${cls}</option>`; });
@@ -562,7 +567,7 @@
     toggleRosterBtn.addEventListener('click', () => {
         rosterCard.style.display = rosterCard.style.display === 'block' ? 'none' : 'block';
         if(rosterCard.style.display === 'block') {
-            leaderboardCard.style.display = 'none'; // 隱藏另一個卡片保持簡潔
+            leaderboardCard.style.display = 'none';
             loadRosterToTextarea();
         }
     });
@@ -605,6 +610,7 @@
         rosterTextArea.value = (studentRosters[cls] || []).join('\n');
     }
 
+    // 🌟 關鍵優化 1：儲存名冊後，強行與「新增功課」表單進行雙向同步與重繪
     saveRosterBtn.addEventListener('click', () => {
         const cls = rosterClassSelect.value;
         if (!cls) return alert('請先選擇或新增一個班別！');
@@ -612,26 +618,34 @@
         const list = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
         studentRosters[cls] = list;
         localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
+        
         alert(`成功儲存 ${cls} 班學生名單（共 ${list.length} 人）！`);
+        
+        // 自動幫老師把「新增記錄」的班別切換為該班，並瞬間刷新學生名單
+        studentClassInput.value = cls;
         updateStudentDropdown();
     });
 
+    // 🌟 關鍵優化 2：增加監聽 'change' 事件，當「新增功課」切換班別時，100% 刷新學生選單
     studentClassInput.addEventListener('change', updateStudentDropdown);
 
     function updateStudentDropdown() {
         const selectedClass = studentClassInput.value;
         studentNameSelect.innerHTML = '';
+        
         if (!selectedClass) {
             studentNameSelect.innerHTML = '<option value="" disabled selected>請先選擇班別</option>';
             return;
         }
-        const classList = studentRosters[selectedClass] || [];
-        if (classList.length === 0) {
+
+        const classListNames = studentRosters[selectedClass] || [];
+        if (classListNames.length === 0) {
             studentNameSelect.innerHTML = '<option value="" disabled selected>⚠️ 此班級尚未建立名單</option>';
             return;
         }
+
         let optionsHtml = '<option value="" disabled selected>請選取學號與學生</option>';
-        classList.forEach(student => {
+        classListNames.forEach(student => {
             optionsHtml += `<option value="${escapeHtml(student)}">${escapeHtml(student)}</option>`;
         });
         studentNameSelect.innerHTML = optionsHtml;
@@ -643,7 +657,7 @@
     toggleLeaderboardBtn.addEventListener('click', () => {
         leaderboardCard.style.display = leaderboardCard.style.display === 'block' ? 'none' : 'block';
         if (leaderboardCard.style.display === 'block') {
-            rosterCard.style.display = 'none'; // 隱藏另一個卡片
+            rosterCard.style.display = 'none';
             renderLeaderboard();
         }
     });
@@ -654,11 +668,9 @@
         const filterClass = leaderboardClassFilter.value;
         const stats = {};
 
-        // 統計每位學生的資料
         records.forEach(r => {
             if (filterClass !== 'ALL' && r.className !== filterClass) return;
 
-            // 使用「班別+原始姓名」作為唯一鍵值，避免同名同姓
             const key = r.className + '___' + r.name;
             if (!stats[key]) {
                 const info = splitIdAndName(r.name);
@@ -681,17 +693,12 @@
             }
         });
 
-        // 轉換為陣列並排序
         const statsArray = Object.values(stats);
         statsArray.sort((a, b) => {
-            // 第一順位：目前未交次數 (降序)
             if (b.pending !== a.pending) return b.pending - a.pending;
-            // 第二順位：總欠交次數 (降序)
             if (b.total !== a.total) return b.total - a.total;
-            // 第三順位：班別 (升序)
             const classCompare = a.className.localeCompare(b.className, 'zh-Hant', { numeric: true });
             if (classCompare !== 0) return classCompare;
-            // 第四順位：學號 (升序)
             return a.rawName.localeCompare(b.rawName, 'zh-Hant', { numeric: true });
         });
 
@@ -897,7 +904,6 @@
             recordTableBody.appendChild(tr);
         });
         
-        // 每次更新主表時，同步更新排行榜 (如果打開的話)
         if (leaderboardCard.style.display === 'block') {
             renderLeaderboard();
         }
@@ -974,7 +980,6 @@
         }
     });
 
-    // 監聽各種過濾事件
     statusFilter.addEventListener('change', function() { localStorage.setItem('homeworkStatusFilter', statusFilter.value); renderTable(); });
     classFilter.addEventListener('change', renderTable);
     nameSearch.addEventListener('input', renderTable);
@@ -1070,15 +1075,15 @@
         reader.readAsText(file);
     });
 
-    // 啟動
+    // 🌟 關鍵優化 3：初始化啟動時，若已有預設班別，強制連動生成第一個班別的學生清單
     renderClassDropdowns();
+    if (classList.length > 0) {
+        studentClassInput.value = classList[0]; // 預設選擇第一個班別
+        updateStudentDropdown(); // 強制連動刷新對應的學生下拉選單
+    }
     autoCleanRecords();
     renderTable();
 </script>
-
-</body>
-</html>
-
 
 </body>
 </html>
