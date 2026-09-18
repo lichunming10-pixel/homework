@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (即時修正版)</title>
+    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (備份版)</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -28,7 +28,7 @@
 
         .container {
             width: 100%;
-            max-width: 1050px;
+            max-width: 950px;
         }
 
         header {
@@ -152,22 +152,19 @@
             font-weight: bold;
         }
 
-        .btn-action {
-            padding: 6px 10px;
-            font-size: 13px;
+        .btn-delete {
+            background-color: var(--danger-color);
+            padding: 6px 12px;
+            font-size: 14px;
             width: auto;
-            border-radius: 4px;
-            margin-right: 4px;
-            margin-bottom: 4px;
         }
-        .btn-resolve { background-color: #28a745; }
-        .btn-resolve:hover { background-color: #218838; }
-        .btn-undo { background-color: #f39c12; }
-        .btn-undo:hover { background-color: #e67e22; }
-        .btn-delete { background-color: var(--danger-color); }
-        .btn-delete:hover { background-color: #d15a63; }
 
-        .btn-export, .btn-backup, .btn-restore {
+        .btn-delete:hover {
+            background-color: #d15a63;
+        }
+
+        .btn-export {
+            background-color: var(--success-color);
             width: auto;
             padding: 8px 16px;
             font-size: 14px;
@@ -175,14 +172,41 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-export { background-color: var(--success-color); }
-        .btn-export:hover { background-color: #27ae60; }
-        .btn-backup { background-color: #9b59b6; }
-        .btn-backup:hover { background-color: #8e44ad; }
-        .btn-restore { background-color: #34495e; }
-        .btn-restore:hover { background-color: #2c3e50; }
-        
+
+        .btn-export:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-backup {
+            background-color: #9b59b6;
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-backup:hover {
+            background-color: #8e44ad;
+        }
+
+        .btn-restore {
+            background-color: #34495e;
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-restore:hover {
+            background-color: #2c3e50;
+        }
+
         .btn-toggle {
+            background-color: #6c757d;
             font-size: 14px;
             padding: 8px 16px;
             width: auto;
@@ -230,40 +254,6 @@
             display: none;
             margin-top: 15px;
         }
-
-        .leaderboard-card {
-            background: #fffdf8;
-            border: 1px solid var(--warning-color);
-            border-top: 4px solid var(--warning-color);
-            display: none;
-            margin-top: 15px;
-        }
-        
-        .manage-class-box {
-            display: flex; 
-            gap: 10px; 
-            background: #e9ecef; 
-            padding: 10px; 
-            border-radius: 4px;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 4px;
-        }
-        .status-pending { background-color: #fce4e4; color: #c0392b; }
-        .status-resolved { background-color: #e8f8f5; color: #27ae60; }
-        
-        .resolved-item {
-            text-decoration: line-through;
-            color: #888;
-        }
     </style>
 </head>
 <body>
@@ -271,88 +261,52 @@
 <div class="container">
     <header>
         <h1>🏫 聖公會蔡功譜中學</h1>
-        <h2>📝 學生欠交功課統計系統 (修正優化版)</h2>
-        <p>追蹤補交過程、統計排行榜、自訂班別名單與一鍵備份</p>
+        <h2>📝 學生欠交功課統計系統 (本地備份版)</h2>
+        <p>無伺服器、保密性高、支援一鍵手動備份與跨設備導入</p>
     </header>
 
+    <!-- 自動清理通知欄 -->
     <div id="cleanAlert" class="clean-alert">
-        ⚠️ <strong>系統通知：</strong> 系統已自動為您清除 <span id="cleanedCount">0</span> 筆過期的本地記錄！
+        ⚠️ <strong>系統通知：</strong> 為了保持瀏覽順暢，系統已自動為您清除 <span id="cleanedCount">0</span> 筆過期的本地記錄！
     </div>
 
-    <!-- 頂部按鈕區塊 -->
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
-        <button id="toggleLeaderboardBtn" class="btn-toggle" style="background-color: var(--warning-color); color: #fff;">📊 查看欠交次數排行榜</button>
-        <button id="toggleRosterBtn" class="btn-toggle" style="background-color: #6c757d; color: #fff;">⚙️ 管理班別與學生名冊</button>
+    <!-- 頂部按鈕：控制展開「學生名單設定」 -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+        <button id="toggleRosterBtn" class="btn-toggle">⚙️ 設定各班本地學生名冊</button>
     </div>
 
-    <!-- 📊 排行榜區塊 -->
-    <div id="leaderboardCard" class="card leaderboard-card">
-        <h3>🏆 學生欠交次數排行榜</h3>
-        <p style="font-size: 14px; color: #666;">系統會自動計算每位學生的欠交總次數，並依照<strong>「🔴 目前未交」</strong>次數由多到少進行排名。</p>
-        
-        <div class="filter-section" style="background: #fff3cd; border: 1px solid #ffeeba;">
-            <div class="filter-group">
-                <label for="leaderboardClassFilter">🔍 篩選班別：</label>
-                <select id="leaderboardClassFilter">
-                    <option value="ALL">顯示全校總排行</option>
-                </select>
-            </div>
-            <button id="exportLeaderboardBtn" class="btn-export" style="margin-left: auto;">📥 匯出排行榜 Excel</button>
-        </div>
-        
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 10%">排名</th>
-                        <th style="width: 12%">班別</th>
-                        <th style="width: 12%">學號</th>
-                        <th style="width: 20%">學生姓名</th>
-                        <th style="width: 15%; color: #c0392b;">🔴 目前未交</th>
-                        <th style="width: 15%; color: #27ae60;">🟢 已補交</th>
-                        <th style="width: 16%">總欠交記錄</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardTableBody">
-                </tbody>
-            </table>
-            <div id="noLeaderboardMessage" class="no-data">目前沒有任何欠交記錄 👍</div>
-        </div>
-    </div>
-
-    <!-- ⚙️ 班別與學生名單管理區塊 -->
+    <!-- 學生名單管理區塊 -->
     <div id="rosterCard" class="card roster-card">
-        <h3>👥 班別與學生名冊管理</h3>
-        
-        <div class="manage-class-box">
-            <strong style="white-space: nowrap;">✨ 新增班別：</strong>
-            <input type="text" id="newClassInput" placeholder="例如：4A" style="width: 150px; padding: 6px;">
-            <button id="addClassBtn" style="width: auto; padding: 6px 15px; background: #28a745;">加入</button>
-        </div>
-
-        <p style="font-size: 14px; color: #666; margin-top: 10px;">
-            💡 <strong>輸入規範：</strong>請使用<strong>「學號 + 空格 + 姓名」</strong>的格式（例如：<code>01 陳大文</code>）。
-        </p>
+        <h3>👥 設定各班學生名冊</h3>
+        <p style="font-size: 14px; color: #666;">請先選擇班別，再貼上該班學生姓名（<strong>每行輸入一位學生姓名</strong>，可以直接從 Excel 複製貼上）：</p>
         
         <div class="form-row">
             <div class="form-group" style="flex: 1;">
-                <label for="rosterClassSelect">選擇班別</label>
-                <select id="rosterClassSelect"></select>
-                <button id="deleteClassBtn" class="btn-delete" style="margin-top: 10px; width: 100%;">🗑️ 刪除此班別</button>
+                <label for="rosterClassSelect">選擇要設定的班別</label>
+                <select id="rosterClassSelect">
+                    <option value="1A">1A</option>
+                    <option value="1B">1B</option>
+                    <option value="1C">1C</option>
+                    <option value="2A">2A</option>
+                    <option value="2B">2B</option>
+                    <option value="2C">2C</option>
+                    <option value="3A">3A</option>
+                    <option value="3B">3B</option>
+                    <option value="3C">3C</option>
+                </select>
             </div>
             <div class="form-group" style="flex: 3;">
-                <label for="rosterTextArea">該班學生名單（每行一人）</label>
-                <textarea id="rosterTextArea" placeholder="01 陳大文&#10;02 張小明&#10;03 李美美"></textarea>
+                <label for="rosterTextArea">貼上學生名單（每行一人）</label>
+                <textarea id="rosterTextArea" placeholder="陳大文&#10;張小明&#10;李美美"></textarea>
             </div>
         </div>
-        
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-            <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">💾 儲存該班名單</button>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">儲存該班名單</button>
             <button id="closeRosterBtn" style="width: auto; background-color: #6c757d;">收起設定</button>
         </div>
     </div>
 
-    <!-- ➕ 輸入表單 -->
+    <!-- 輸入表單 -->
     <div class="card">
         <h3>➕ 新增欠交記錄</h3>
         <form id="recordForm">
@@ -365,79 +319,79 @@
                     <label for="studentClass">班別</label>
                     <select id="studentClass" required>
                         <option value="" disabled selected>請選擇班別</option>
+                        <option value="1A">1A</option>
+                        <option value="1B">1B</option>
+                        <option value="1C">1C</option>
+                        <option value="2A">2A</option>
+                        <option value="2B">2B</option>
+                        <option value="2C">2C</option>
+                        <option value="3A">3A</option>
+                        <option value="3B">3B</option>
+                        <option value="3C">3C</option>
                     </select>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label for="studentNameSelect">選擇學生</label>
+                    <label for="studentNameSelect">學生姓名</label>
                     <select id="studentNameSelect" required>
                         <option value="" disabled selected>請先選擇班別</option>
                     </select>
                 </div>
                 <div class="form-group" style="flex: 2;">
                     <label for="homeworkItem">欠交項目</label>
-                    <input type="text" id="homeworkItem" placeholder="例如：中文工作紙 (三)" required>
+                    <input type="text" id="homeworkItem" placeholder="例如：中文工作紙 (三)、數學書 P.12" required>
                 </div>
             </div>
             <button type="submit">儲存記錄</button>
         </form>
     </div>
 
-    <!-- 📋 數據顯示列表 -->
+    <!-- 數據顯示列表 -->
     <div class="card">
-        <h3>📋 欠交與補交記錄列表</h3>
+        <h3>📋 欠交功課列表</h3>
 
+        <!-- 控制區塊 -->
         <div class="filter-section">
-            <div class="filter-group">
-                <label for="statusFilter">📋 狀態：</label>
-                <select id="statusFilter" style="font-weight: bold; color: var(--primary-color);">
-                    <option value="pending" selected>🔴 僅顯示未交</option>
-                    <option value="resolved">🟢 僅顯示已補交</option>
-                    <option value="ALL">顯示全部記錄</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="sortOrder">↕️ 排序：</label>
-                <select id="sortOrder">
-                    <option value="dateDesc">按日期 (最新至最舊)</option>
-                    <option value="nameAsc">按學號排序 (由小至大)</option>
-                    <option value="classAndName">按班別 + 學號 (推薦導出用)</option>
-                </select>
-            </div>
-            
             <div class="filter-group">
                 <label for="classFilter">🔍 班別：</label>
                 <select id="classFilter">
                     <option value="ALL">顯示所有班別</option>
+                    <option value="1A">1A</option>
+                    <option value="1B">1B</option>
+                    <option value="1C">1C</option>
+                    <option value="2A">2A</option>
+                    <option value="2B">2B</option>
+                    <option value="2C">2C</option>
+                    <option value="3A">3A</option>
+                    <option value="3B">3B</option>
+                    <option value="3C">3C</option>
                 </select>
             </div>
-            
             <div class="filter-group">
-                <label for="nameSearch">👤 搜尋：</label>
-                <input type="text" id="nameSearch" placeholder="請輸入關鍵字...">
+                <label for="nameSearch">👤 姓名搜尋：</label>
+                <input type="text" id="nameSearch" placeholder="請輸入姓名關鍵字...">
             </div>
-            
             <div class="filter-group">
-                <label for="cleanPolicy">📅 歷史保留：</label>
+                <label for="cleanPolicy">📅 歷史數據保留：</label>
                 <select id="cleanPolicy">
-                    <option value="7">只保留最近 7 天</option>
-                    <option value="30" selected>只保留最近 30 天</option>
-                    <option value="90">只保留最近 90 天</option>
-                    <option value="NEVER">不自動清除 (永久)</option>
+                    <option value="7">只保留最近 7 天 (按週)</option>
+                    <option value="30" selected>只保留最近 30 天 (按月)</option>
+                    <option value="90">只保留最近 90 天 (按季)</option>
+                    <option value="NEVER">不自動清除 (永久保留)</option>
                 </select>
             </div>
         </div>
 
         <div class="stats-bar">
-            <span id="totalCount">總計：0 筆</span>
+            <span id="totalCount">總計欠交：0 筆</span>
             <div class="action-buttons">
                 <button id="exportBtn" class="btn-export">📥 匯出 Excel 報表</button>
-                <button id="exportBackupBtn" class="btn-backup">📤 導出備份</button>
-                <button id="importBackupBtn" class="btn-restore">📥 導入備份</button>
+                <button id="exportBackupBtn" class="btn-backup">📤 導出數據備份</button>
+                <button id="importBackupBtn" class="btn-restore">📥 導入數據備份</button>
+                <!-- 隱藏的檔案輸入框用作導入備份 -->
                 <input type="file" id="fileInput" accept=".json" style="display: none;">
-                <button id="clearFilteredResolvedBtn" class="btn-delete" style="width: auto; padding: 5px 10px;">🧹 清除已補交記錄</button>
+                <button id="clearAllBtn" class="btn-delete" style="width: auto; padding: 5px 10px;">清除所有數據</button>
             </div>
         </div>
         
@@ -445,410 +399,164 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 12%">登記日期</th>
-                        <th style="width: 10%">班別</th>
-                        <th style="width: 10%">學號</th>
-                        <th style="width: 15%">學生姓名</th>
-                        <th style="width: 33%">欠交項目與狀態</th>
-                        <th style="width: 20%">操作</th>
+                        <th style="width: 20%">時間</th>
+                        <th style="width: 15%">班別</th>
+                        <th style="width: 20%">學生姓名</th>
+                        <th style="width: 30%">欠交項目</th>
+                        <th style="width: 15%">操作</th>
                     </tr>
                 </thead>
                 <tbody id="recordTableBody">
                 </tbody>
             </table>
-            <div id="noDataMessage" class="no-data">目前沒有符合條件的記錄 👍</div>
+            <div id="noDataMessage" class="no-data">目前沒有符合篩選或搜尋條件的記錄 👍</div>
         </div>
     </div>
 </div>
 
 <script>
-    // ------------------------------------------
-    // DOM 元素初始化
-    // ------------------------------------------
+    // 初始化 DOM 元素
     const recordForm = document.getElementById('recordForm');
     const recordDateInput = document.getElementById('recordDate');
     const studentClassInput = document.getElementById('studentClass');
     const studentNameSelect = document.getElementById('studentNameSelect');
     const homeworkItemInput = document.getElementById('homeworkItem');
-    
-    const statusFilter = document.getElementById('statusFilter');
     const classFilter = document.getElementById('classFilter');
     const nameSearch = document.getElementById('nameSearch');
-    const sortOrder = document.getElementById('sortOrder');
     const cleanPolicy = document.getElementById('cleanPolicy');
     const cleanAlert = document.getElementById('cleanAlert');
     const cleanedCountSpan = document.getElementById('cleanedCount');
     const recordTableBody = document.getElementById('recordTableBody');
     const noDataMessage = document.getElementById('noDataMessage');
     const totalCountSpan = document.getElementById('totalCount');
-    const clearFilteredResolvedBtn = document.getElementById('clearFilteredResolvedBtn');
-    
+    const clearAllBtn = document.getElementById('clearAllBtn');
     const exportBtn = document.getElementById('exportBtn');
     const exportBackupBtn = document.getElementById('exportBackupBtn');
     const importBackupBtn = document.getElementById('importBackupBtn');
     const fileInput = document.getElementById('fileInput');
 
+    // 名單管理 DOM
     const toggleRosterBtn = document.getElementById('toggleRosterBtn');
     const rosterCard = document.getElementById('rosterCard');
     const rosterClassSelect = document.getElementById('rosterClassSelect');
     const rosterTextArea = document.getElementById('rosterTextArea');
     const saveRosterBtn = document.getElementById('saveRosterBtn');
     const closeRosterBtn = document.getElementById('closeRosterBtn');
-    const newClassInput = document.getElementById('newClassInput');
-    const addClassBtn = document.getElementById('addClassBtn');
-    const deleteClassBtn = document.getElementById('deleteClassBtn');
 
-    // 排行榜 DOM
-    const toggleLeaderboardBtn = document.getElementById('toggleLeaderboardBtn');
-    const leaderboardCard = document.getElementById('leaderboardCard');
-    const leaderboardClassFilter = document.getElementById('leaderboardClassFilter');
-    const leaderboardTableBody = document.getElementById('leaderboardTableBody');
-    const noLeaderboardMessage = document.getElementById('noLeaderboardMessage');
-    const exportLeaderboardBtn = document.getElementById('exportLeaderboardBtn');
+    // 設定預設日期為今天
+    const today = new Date().toISOString().split('T')[0];
+    recordDateInput.value = today;
 
-    recordDateInput.value = new Date().toISOString().split('T')[0];
-
-    // 讀取本地資料
+    // 從 localStorage 讀取數據、清理原則與學生名冊
     let records = JSON.parse(localStorage.getItem('homeworkRecords')) || [];
     let savedPolicy = localStorage.getItem('homeworkCleanPolicy') || "30";
     cleanPolicy.value = savedPolicy;
-    
-    let savedSortOrder = localStorage.getItem('homeworkSortOrder') || "dateDesc";
-    sortOrder.value = savedSortOrder;
-    
-    let savedStatusFilter = localStorage.getItem('homeworkStatusFilter') || "pending";
-    statusFilter.value = savedStatusFilter;
-
     let studentRosters = JSON.parse(localStorage.getItem('studentRosters')) || {};
-    let classList = JSON.parse(localStorage.getItem('homeworkClasses')) || ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
 
-    // ------------------------------------------
-    // 💡 輔助函數：解析學號與姓名
-    // ------------------------------------------
-    function splitIdAndName(rawString) {
-        if (!rawString) return { id: "", name: "" };
-        const trimmed = rawString.trim();
-        const match = trimmed.match(/^(\d+)\s+(.+)$/);
-        if (match) return { id: match, name: match };
-        return { id: "", name: trimmed };
-    }
-
-    // ------------------------------------------
-    // 班別與名單管理功能
-    // ------------------------------------------
-    function renderClassDropdowns() {
-        let recordClassHtml = '<option value="" disabled selected>請選擇班別</option>';
-        classList.forEach(cls => { recordClassHtml += `<option value="${cls}">${cls}</option>`; });
-        
-        const currentRecordClass = studentClassInput.value;
-        studentClassInput.innerHTML = recordClassHtml;
-        if (classList.includes(currentRecordClass)) {
-            studentClassInput.value = currentRecordClass;
-        }
-
-        let filterClassHtml = '<option value="ALL">顯示所有班別</option>';
-        classList.forEach(cls => { filterClassHtml += `<option value="${cls}">${cls}</option>`; });
-        const currentFilterClass = classFilter.value;
-        classFilter.innerHTML = filterClassHtml;
-        if (currentFilterClass === 'ALL' || classList.includes(currentFilterClass)) classFilter.value = currentFilterClass;
-
-        // 同步排行榜的班別篩選
-        const currentLbClass = leaderboardClassFilter.value;
-        leaderboardClassFilter.innerHTML = '<option value="ALL">顯示全校總排行</option>' + classList.map(cls => `<option value="${cls}">${cls}</option>`).join('');
-        if (currentLbClass === 'ALL' || classList.includes(currentLbClass)) leaderboardClassFilter.value = currentLbClass;
-
-        let rosterClassHtml = classList.length === 0 ? '<option value="" disabled selected>請先新增班別</option>' : '';
-        classList.forEach(cls => { rosterClassHtml += `<option value="${cls}">${cls}</option>`; });
-        const currentRosterClass = rosterClassSelect.value;
-        rosterClassSelect.innerHTML = rosterClassHtml;
-        if (classList.includes(currentRosterClass)) rosterClassSelect.value = currentRosterClass;
-    }
-
+    // --- 名冊管理邏輯 ---
     toggleRosterBtn.addEventListener('click', () => {
         rosterCard.style.display = rosterCard.style.display === 'block' ? 'none' : 'block';
-        if(rosterCard.style.display === 'block') {
-            leaderboardCard.style.display = 'none';
-            loadRosterToTextarea();
-        }
-    });
-    closeRosterBtn.addEventListener('click', () => { rosterCard.style.display = 'none'; });
-
-    addClassBtn.addEventListener('click', () => {
-        const newClass = newClassInput.value.trim().toUpperCase();
-        if (!newClass) return alert('請輸入班別名稱！');
-        if (classList.includes(newClass)) return alert('此班別已經存在！');
-        
-        classList.push(newClass);
-        classList.sort(); 
-        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
-        newClassInput.value = '';
-        renderClassDropdowns();
-        rosterClassSelect.value = newClass; 
         loadRosterToTextarea();
     });
 
-    deleteClassBtn.addEventListener('click', () => {
-        const targetClass = rosterClassSelect.value;
-        if (!targetClass) return;
-        if (confirm(`⚠️ 確定要刪除「${targetClass}」班嗎？`)) {
-            classList = classList.filter(cls => cls !== targetClass);
-            delete studentRosters[targetClass];
-            localStorage.setItem('homeworkClasses', JSON.stringify(classList));
-            localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
-            renderClassDropdowns();
-            loadRosterToTextarea();
-            updateStudentDropdown();
-            renderLeaderboard();
-        }
+    closeRosterBtn.addEventListener('click', () => {
+        rosterCard.style.display = 'none';
     });
 
     rosterClassSelect.addEventListener('change', loadRosterToTextarea);
 
     function loadRosterToTextarea() {
         const cls = rosterClassSelect.value;
-        if (!cls) { rosterTextArea.value = ''; return; }
-        rosterTextArea.value = (studentRosters[cls] || []).join('\n');
+        const list = studentRosters[cls] || [];
+        rosterTextArea.value = list.join('\n');
     }
 
-    // 🌟 關鍵優化 1：儲存名冊後，強行與「新增功課」表單進行雙向同步與重繪
     saveRosterBtn.addEventListener('click', () => {
         const cls = rosterClassSelect.value;
-        if (!cls) return alert('請先選擇或新增一個班別！');
         const text = rosterTextArea.value.trim();
         const list = text.split('\n').map(name => name.trim()).filter(name => name.length > 0);
+        
         studentRosters[cls] = list;
         localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
         
         alert(`成功儲存 ${cls} 班學生名單（共 ${list.length} 人）！`);
-        
-        // 自動幫老師把「新增記錄」的班別切換為該班，並瞬間刷新學生名單
-        studentClassInput.value = cls;
         updateStudentDropdown();
     });
 
-    // 🌟 關鍵優化 2：增加監聽 'change' 事件，當「新增功課」切換班別時，100% 刷新學生選單
     studentClassInput.addEventListener('change', updateStudentDropdown);
 
     function updateStudentDropdown() {
         const selectedClass = studentClassInput.value;
         studentNameSelect.innerHTML = '';
-        
+
         if (!selectedClass) {
             studentNameSelect.innerHTML = '<option value="" disabled selected>請先選擇班別</option>';
             return;
         }
 
-        const classListNames = studentRosters[selectedClass] || [];
-        if (classListNames.length === 0) {
+        const classList = studentRosters[selectedClass] || [];
+        if (classList.length === 0) {
             studentNameSelect.innerHTML = '<option value="" disabled selected>⚠️ 此班級尚未建立名單</option>';
             return;
         }
 
-        let optionsHtml = '<option value="" disabled selected>請選取學號與學生</option>';
-        classListNames.forEach(student => {
+        let optionsHtml = '<option value="" disabled selected>請選取學生</option>';
+        classList.forEach(student => {
             optionsHtml += `<option value="${escapeHtml(student)}">${escapeHtml(student)}</option>`;
         });
+        
         studentNameSelect.innerHTML = optionsHtml;
     }
 
-    // ------------------------------------------
-    // 🏆 排行榜邏輯
-    // ------------------------------------------
-    toggleLeaderboardBtn.addEventListener('click', () => {
-        leaderboardCard.style.display = leaderboardCard.style.display === 'block' ? 'none' : 'block';
-        if (leaderboardCard.style.display === 'block') {
-            rosterCard.style.display = 'none';
-            renderLeaderboard();
-        }
-    });
-
-    leaderboardClassFilter.addEventListener('change', renderLeaderboard);
-
-    function getLeaderboardData() {
-        const filterClass = leaderboardClassFilter.value;
-        const stats = {};
-
-        records.forEach(r => {
-            if (filterClass !== 'ALL' && r.className !== filterClass) return;
-
-            const key = r.className + '___' + r.name;
-            if (!stats[key]) {
-                const info = splitIdAndName(r.name);
-                stats[key] = {
-                    className: r.className,
-                    id: info.id,
-                    name: info.name,
-                    rawName: r.name,
-                    pending: 0,
-                    resolved: 0,
-                    total: 0
-                };
-            }
-            
-            stats[key].total++;
-            if ((r.status || 'pending') === 'resolved') {
-                stats[key].resolved++;
-            } else {
-                stats[key].pending++;
-            }
-        });
-
-        const statsArray = Object.values(stats);
-        statsArray.sort((a, b) => {
-            if (b.pending !== a.pending) return b.pending - a.pending;
-            if (b.total !== a.total) return b.total - a.total;
-            const classCompare = a.className.localeCompare(b.className, 'zh-Hant', { numeric: true });
-            if (classCompare !== 0) return classCompare;
-            return a.rawName.localeCompare(b.rawName, 'zh-Hant', { numeric: true });
-        });
-
-        return statsArray;
-    }
-
-    function renderLeaderboard() {
-        leaderboardTableBody.innerHTML = '';
-        const statsArray = getLeaderboardData();
-
-        if (statsArray.length === 0) {
-            noLeaderboardMessage.style.display = 'block';
-            exportLeaderboardBtn.style.display = 'none';
-            return;
-        }
-
-        noLeaderboardMessage.style.display = 'none';
-        exportLeaderboardBtn.style.display = 'inline-flex';
-
-        let rank = 1;
-        statsArray.forEach(stat => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>#${rank++}</strong></td>
-                <td><span class="badge">${escapeHtml(stat.className)}</span></td>
-                <td><span style="color: #6c757d;">${escapeHtml(stat.id || '—')}</span></td>
-                <td><strong>${escapeHtml(stat.name)}</strong></td>
-                <td style="color: #c0392b; font-weight: bold; font-size: 16px;">${stat.pending}</td>
-                <td style="color: #27ae60;">${stat.resolved}</td>
-                <td><strong>${stat.total}</strong></td>
-            `;
-            leaderboardTableBody.appendChild(tr);
-        });
-    }
-
-    exportLeaderboardBtn.addEventListener('click', function() {
-        const statsArray = getLeaderboardData();
-        if (statsArray.length === 0) return;
-
-        let csvContent = "\uFEFF排名,班別,學號,學生姓名,目前未交次數,已補交次數,總欠交次數\n";
-        let rank = 1;
-        
-        statsArray.forEach(stat => {
-            const safeId = `"${String(stat.id).replace(/"/g, '""')}"`;
-            const safeName = `"${stat.name.replace(/"/g, '""')}"`;
-            csvContent += `${rank++},${stat.className},${safeId},${safeName},${stat.pending},${stat.resolved},${stat.total}\n`;
-        });
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        const lbClass = leaderboardClassFilter.value === 'ALL' ? '全校' : `${leaderboardClassFilter.value}班`;
-        const exportDate = new Date().toISOString().split('T')[0];
-        
-        link.setAttribute("href", url);
-        link.setAttribute("download", `欠交次數排行榜_${lbClass}_${exportDate}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
-
-    // ------------------------------------------
-    // 記錄管理、清理與列表渲染邏輯
-    // ------------------------------------------
+    // --- 數據統計與清理邏輯 ---
     function autoCleanRecords() {
         const policy = cleanPolicy.value;
         if (policy === 'NEVER') return;
-        const limitDate = new Date();
-        limitDate.setDate(limitDate.getDate() - parseInt(policy));
+
+        const daysLimit = parseInt(policy);
+        const todayDate = new Date();
+        const limitDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate() - daysLimit);
+        
         const originalLength = records.length;
         
-        records = records.filter(record => new Date(record.date) >= limitDate);
+        records = records.filter(record => {
+            const recordDate = new Date(record.date);
+            return recordDate >= limitDate;
+        });
+
         const deletedCount = originalLength - records.length;
+
         if (deletedCount > 0) {
             localStorage.setItem('homeworkRecords', JSON.stringify(records));
             cleanedCountSpan.textContent = deletedCount;
             cleanAlert.style.display = 'flex';
-            setTimeout(() => cleanAlert.style.display = 'none', 5000);
+            setTimeout(() => {
+                cleanAlert.style.display = 'none';
+            }, 5000);
         }
     }
 
     function getFilteredRecords() {
         const selectedClass = classFilter.value;
         const searchQuery = nameSearch.value.trim().toLowerCase();
-        const selectedStatus = statusFilter.value;
 
         return records.filter(record => {
-            const recordStatus = record.status || 'pending';
-            const matchesStatus = (selectedStatus === 'ALL' || recordStatus === selectedStatus);
             const matchesClass = (selectedClass === 'ALL' || record.className === selectedClass);
             const matchesName = record.name.toLowerCase().includes(searchQuery);
-            return matchesStatus && matchesClass && matchesName;
+            return matchesClass && matchesName;
         });
-    }
-
-    function getFilteredResolvedRecords() {
-        const selectedClass = classFilter.value;
-        const searchQuery = nameSearch.value.trim().toLowerCase();
-        return records.filter(record => {
-            const recordStatus = record.status || 'pending';
-            const matchesStatus = (recordStatus === 'resolved');
-            const matchesClass = (selectedClass === 'ALL' || record.className === selectedClass);
-            const matchesName = record.name.toLowerCase().includes(searchQuery);
-            return matchesStatus && matchesClass && matchesName;
-        });
-    }
-
-    function getSortedRecords(recordsToSort) {
-        const currentSort = sortOrder.value;
-        return [...recordsToSort].sort((a, b) => {
-            if (currentSort === 'dateDesc') return new Date(b.date) - new Date(a.date);
-            if (currentSort === 'nameAsc') return a.name.localeCompare(b.name, 'zh-Hant', { numeric: true });
-            if (currentSort === 'classAndName') {
-                const classCompare = a.className.localeCompare(b.className, 'zh-Hant', { numeric: true });
-                if (classCompare !== 0) return classCompare;
-                return a.name.localeCompare(b.name, 'zh-Hant', { numeric: true });
-            }
-        });
-    }
-
-    function updateClearButtonText() {
-        const selectedClass = classFilter.value;
-        const searchQuery = nameSearch.value.trim();
-        const resolvedList = getFilteredResolvedRecords();
-        
-        let label = '🧹 清除已補交記錄';
-        if (selectedClass !== 'ALL' && searchQuery !== '') label = `🧹 清除 ${selectedClass} 班含「${searchQuery}」的已補交記錄 (${resolvedList.length})`;
-        else if (selectedClass !== 'ALL') label = `🧹 清除 ${selectedClass} 班的已補交記錄 (${resolvedList.length})`;
-        else if (searchQuery !== '') label = `🧹 清除含「${searchQuery}」的已補交記錄 (${resolvedList.length})`;
-        else label = `🧹 清除全校所有已補交記錄 (${resolvedList.length})`;
-        
-        clearFilteredResolvedBtn.textContent = label;
-        if (resolvedList.length === 0) {
-            clearFilteredResolvedBtn.style.opacity = '0.5';
-            clearFilteredResolvedBtn.style.cursor = 'not-allowed';
-        } else {
-            clearFilteredResolvedBtn.style.opacity = '1';
-            clearFilteredResolvedBtn.style.cursor = 'pointer';
-        }
     }
 
     function renderTable() {
         recordTableBody.innerHTML = '';
+        const selectedClass = classFilter.value;
+        const searchQuery = nameSearch.value.trim().toLowerCase();
+        
         const filteredRecords = getFilteredRecords();
-        updateClearButtonText();
 
         if (filteredRecords.length === 0) {
             noDataMessage.style.display = 'block';
-            totalCountSpan.textContent = '找到 0 筆記錄';
+            totalCountSpan.textContent = '找到 0 筆相關記錄';
             exportBtn.style.display = 'none';
             return;
         }
@@ -856,231 +564,198 @@
         noDataMessage.style.display = 'none';
         exportBtn.style.display = 'inline-flex';
         
-        const selectedClass = classFilter.value;
-        const selectedStatus = statusFilter.value;
-        
         let statsText = '';
-        if (selectedStatus === 'pending') statsText += '未交：';
-        else if (selectedStatus === 'resolved') statsText += '已補交：';
-        else statsText += '總計：';
-        
-        statsText += `${filteredRecords.length} 筆`;
-        if (selectedClass !== 'ALL') statsText = `${selectedClass} 班 ` + statsText;
+        if (selectedClass !== 'ALL' && searchQuery !== '') {
+            statsText = `${selectedClass} 班中符合「${searchQuery}」的欠交記錄：${filteredRecords.length} 筆`;
+        } else if (selectedClass !== 'ALL') {
+            statsText = `${selectedClass} 班總計欠交：${filteredRecords.length} 筆`;
+        } else if (searchQuery !== '') {
+            statsText = `符合「${searchQuery}」的總計欠交：${filteredRecords.length} 筆`;
+        } else {
+            statsText = `總計欠交：${filteredRecords.length} 筆`;
+        }
         totalCountSpan.textContent = statsText;
 
-        const sortedRecords = getSortedRecords(filteredRecords);
+        const sortedRecords = [...filteredRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
 
         sortedRecords.forEach((record) => {
-            const info = splitIdAndName(record.name);
-            const rStatus = record.status || 'pending';
-            const isResolved = (rStatus === 'resolved');
-
-            let itemHtml = escapeHtml(record.item);
-            if (isResolved) {
-                itemHtml = `<span class="resolved-item">${itemHtml}</span><br>
-                            <span class="status-badge status-resolved">✅ 於 ${record.resolveDate} 補交</span>`;
-            } else {
-                itemHtml += `<br><span class="status-badge status-pending">🔴 尚未繳交</span>`;
-            }
-
-            let actionHtml = '';
-            if (isResolved) {
-                actionHtml = `<button class="btn-action btn-undo" onclick="undoResolveRecord('${record.id}')">↩️ 撤銷</button>
-                              <button class="btn-action btn-delete" onclick="deleteRecord('${record.id}')">🗑️ 刪除</button>`;
-            } else {
-                actionHtml = `<button class="btn-action btn-resolve" onclick="resolveRecord('${record.id}')">✅ 補交</button>
-                              <button class="btn-action btn-delete" onclick="deleteRecord('${record.id}')">🗑️ 刪除</button>`;
-            }
-
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${record.date}</td>
                 <td><span class="badge">${escapeHtml(record.className)}</span></td>
-                <td><strong style="color: #6c757d;">${escapeHtml(info.id || '—')}</strong></td>
-                <td><strong>${escapeHtml(info.name)}</strong></td>
-                <td>${itemHtml}</td>
-                <td>${actionHtml}</td>
+                <td><strong>${escapeHtml(record.name)}</strong></td>
+                <td>${escapeHtml(record.item)}</td>
+                <td>
+                    <button class="btn-delete" onclick="deleteRecord('${record.id}')">已補交 / 刪除</button>
+                </td>
             `;
             recordTableBody.appendChild(tr);
         });
-        
-        if (leaderboardCard.style.display === 'block') {
-            renderLeaderboard();
-        }
     }
 
-    // ------------------------------------------
-    // API：新增、補交、刪除
-    // ------------------------------------------
+    function escapeHtml(string) {
+        return String(string).replace(/[&<>"']/g, function (s) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[s];
+        });
+    }
+
+    // 新增記錄
     recordForm.addEventListener('submit', function(e) {
         e.preventDefault();
+
         const newRecord = {
             id: Date.now().toString(),
             date: recordDateInput.value,
             className: studentClassInput.value,
             name: studentNameSelect.value,
-            item: homeworkItemInput.value.trim(),
-            status: 'pending'
+            item: homeworkItemInput.value.trim()
         };
+
         records.push(newRecord);
         localStorage.setItem('homeworkRecords', JSON.stringify(records));
         
         studentNameSelect.value = '';
         homeworkItemInput.value = '';
+        
         renderTable();
     });
 
-    window.resolveRecord = function(id) {
-        const record = records.find(r => r.id === id);
-        if (record) {
-            record.status = 'resolved';
-            record.resolveDate = new Date().toISOString().split('T')[0];
-            localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            renderTable();
-        }
-    };
+    classFilter.addEventListener('change', renderTable);
+    nameSearch.addEventListener('input', renderTable);
 
-    window.undoResolveRecord = function(id) {
-        const record = records.find(r => r.id === id);
-        if (record) {
-            record.status = 'pending';
-            delete record.resolveDate;
-            localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            renderTable();
-        }
-    };
+    cleanPolicy.addEventListener('change', function() {
+        localStorage.setItem('homeworkCleanPolicy', cleanPolicy.value);
+        autoCleanRecords();
+        renderTable();
+    });
 
     window.deleteRecord = function(id) {
-        if(confirm('確定要徹底刪除這筆記錄嗎？這項操作無法還原。')) {
-            records = records.filter(record => record.id !== id);
-            localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            renderTable();
-        }
+        records = records.filter(record => record.id !== id);
+        localStorage.setItem('homeworkRecords', JSON.stringify(records));
+        renderTable();
     };
 
-    clearFilteredResolvedBtn.addEventListener('click', function() {
-        const resolvedList = getFilteredResolvedRecords();
-        const count = resolvedList.length;
-        if (count === 0) return;
-
-        const selectedClass = classFilter.value;
-        const searchQuery = nameSearch.value.trim();
-        let conditionText = '';
-        if (selectedClass !== 'ALL' && searchQuery !== '') conditionText = `「${selectedClass} 班且姓名含『${searchQuery}』」`;
-        else if (selectedClass !== 'ALL') conditionText = `「${selectedClass} 班」`;
-        else if (searchQuery !== '') conditionText = `「姓名含『${searchQuery}』」`;
-        else conditionText = `「全校所有班級」`;
-
-        if (confirm(`🧹 安全確認：\n確定要永久清除目前在 ${conditionText} 條件下已補交的功課記錄（共 ${count} 筆）嗎？\n此操作無法還原。`)) {
-            const targetIds = resolvedList.map(r => r.id);
-            records = records.filter(record => !targetIds.includes(record.id));
+    clearAllBtn.addEventListener('click', function() {
+        if (confirm('確定要清除所有的欠交記錄嗎？此操作無法還原。')) {
+            records = [];
             localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            alert(`🎉 成功清除 ${count} 筆符合條件的已補交記錄！`);
             renderTable();
         }
     });
 
-    statusFilter.addEventListener('change', function() { localStorage.setItem('homeworkStatusFilter', statusFilter.value); renderTable(); });
-    classFilter.addEventListener('change', renderTable);
-    nameSearch.addEventListener('input', renderTable);
-    sortOrder.addEventListener('change', function() { localStorage.setItem('homeworkSortOrder', sortOrder.value); renderTable(); });
-    cleanPolicy.addEventListener('change', function() { localStorage.setItem('homeworkCleanPolicy', cleanPolicy.value); autoCleanRecords(); renderTable(); });
-
-    // ------------------------------------------
-    // 📥 匯出與備份邏輯
-    // ------------------------------------------
+    // 匯出 CSV Excel 報表
     exportBtn.addEventListener('click', function() {
         const filteredRecords = getFilteredRecords();
         if (filteredRecords.length === 0) return;
-        const sortedRecords = getSortedRecords(filteredRecords);
-        let csvContent = "\uFEFF登記日期,班別,學號,學生姓名,欠交項目,功課狀態\n";
-        
-        sortedRecords.forEach(record => {
-            const info = splitIdAndName(record.name);
-            const rStatus = record.status || 'pending';
-            const safeId = `"${String(info.id).replace(/"/g, '""')}"`;
-            const safeName = `"${info.name.replace(/"/g, '""')}"`;
+
+        let csvContent = "\uFEFF"; 
+        csvContent += "登記日期,班別,學生姓名,欠交項目\n";
+
+        filteredRecords.forEach(record => {
+            const safeName = `"${record.name.replace(/"/g, '""')}"`;
             const safeItem = `"${record.item.replace(/"/g, '""')}"`;
-            const statusText = rStatus === 'resolved' ? `"已補交 (於 ${record.resolveDate})"` : '"🔴 未交"';
-            csvContent += `${record.date},${record.className},${safeId},${safeName},${safeItem},${statusText}\n`;
+            csvContent += `${record.date},${record.className},${safeName},${safeItem}\n`;
         });
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
+        
         const exportDate = new Date().toISOString().split('T')[0];
-        const statusPrefix = statusFilter.value === 'resolved' ? '補交記錄' : (statusFilter.value === 'pending' ? '欠交記錄' : '綜合功課記錄');
-        const classNameSuffix = classFilter.value === 'ALL' ? '所有班級' : `${classFilter.value}班`;
+        const selectedClass = classFilter.value;
+        const classNameSuffix = selectedClass === 'ALL' ? '所有班級' : `${selectedClass}班`;
         
         link.setAttribute("href", url);
-        link.setAttribute("download", `${statusPrefix}_${classNameSuffix}_${exportDate}.csv`);
+        link.setAttribute("download", `欠交功課報表_${classNameSuffix}_${exportDate}.csv`);
         link.style.visibility = 'hidden';
+        
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     });
 
+    // ==========================================
+    // ⚙️ 新增功能：手動「備份與還原」導出/導入邏輯
+    // ==========================================
+    
+    // 1. 導出備份 (打包欠交記錄與學生名單)
     exportBackupBtn.addEventListener('click', function() {
         const backupData = {
-            classes: classList,
             records: records,
             studentRosters: studentRosters,
             policy: cleanPolicy.value,
-            sortOrder: sortOrder.value,
-            statusFilter: statusFilter.value,
             backupTime: new Date().toLocaleString()
         };
+
         const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
+        const exportDate = new Date().toISOString().split('T')[0];
+
         link.setAttribute("href", url);
-        link.setAttribute("download", `homework_backup_${new Date().toISOString().split('T')[0]}.json`);
+        link.setAttribute("download", `homework_backup_${exportDate}.json`);
         link.style.visibility = 'hidden';
+        
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     });
 
-    importBackupBtn.addEventListener('click', () => fileInput.click());
+    // 2. 觸發隱藏的檔案選擇器
+    importBackupBtn.addEventListener('click', function() {
+        fileInput.click();
+    });
 
+    // 3. 讀取並導入備份檔案
     fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
+
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const importedData = JSON.parse(e.target.result);
+                
+                // 驗證檔案結構是否合規
                 if (importedData.records && importedData.studentRosters) {
-                    if (confirm(`確定導入備份嗎？\n原有的資料將被完全覆蓋！`)) {
+                    if (confirm(`已偵測到備份檔案（備份時間：${importedData.backupTime || '未知'}）。\n這將會覆蓋您目前設備上的所有欠交數據及學生名冊，確定要導入嗎？`)) {
+                        
+                        // 覆蓋本地資料
                         records = importedData.records;
                         studentRosters = importedData.studentRosters;
-                        if (importedData.classes) classList = importedData.classes;
-                        if (importedData.policy) { cleanPolicy.value = importedData.policy; localStorage.setItem('homeworkCleanPolicy', importedData.policy); }
-                        if (importedData.sortOrder) { sortOrder.value = importedData.sortOrder; localStorage.setItem('homeworkSortOrder', importedData.sortOrder); }
-                        if (importedData.statusFilter) { statusFilter.value = importedData.statusFilter; localStorage.setItem('homeworkStatusFilter', importedData.statusFilter); }
+                        if (importedData.policy) {
+                            cleanPolicy.value = importedData.policy;
+                            localStorage.setItem('homeworkCleanPolicy', importedData.policy);
+                        }
 
+                        // 儲存至本地瀏覽器
                         localStorage.setItem('homeworkRecords', JSON.stringify(records));
                         localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
-                        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
 
-                        renderClassDropdowns();
+                        // 重新加載介面
                         updateStudentDropdown();
                         renderTable();
-                        alert('🎉 數據導入成功！');
+                        alert('🎉 數據與學生名冊成功導入並同步！');
                     }
-                } else alert('❌ 導入失敗：格式不符。');
-            } catch (err) { alert('❌ 導入失敗：無法解析檔案。'); }
+                } else {
+                    alert('❌ 導入失敗：此檔案非本系統專用的備份格式。');
+                }
+            } catch (err) {
+                alert('❌ 導入失敗：無法解析該備份檔案。');
+            }
+            // 清空選擇器以利下次重複導入同檔
             fileInput.value = '';
         };
         reader.readAsText(file);
     });
 
-    // 🌟 關鍵優化 3：初始化啟動時，若已有預設班別，強制連動生成第一個班別的學生清單
-    renderClassDropdowns();
-    if (classList.length > 0) {
-        studentClassInput.value = classList[0]; // 預設選擇第一個班別
-        updateStudentDropdown(); // 強制連動刷新對應的學生下拉選單
-    }
+    // 啟動流程
     autoCleanRecords();
     renderTable();
 </script>
