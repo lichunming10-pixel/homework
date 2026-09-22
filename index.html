@@ -14,7 +14,6 @@
             --card-bg: #ffffff;
             --text-color: #333333;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
@@ -25,22 +24,18 @@
             flex-direction: column;
             align-items: center;
         }
-
         .container {
             width: 100%;
             max-width: 950px;
         }
-
         header {
             text-align: center;
             margin-bottom: 30px;
         }
-
         h1 {
             color: var(--primary-color);
             margin-bottom: 5px;
         }
-
         .card {
             background: var(--card-bg);
             border-radius: 8px;
@@ -49,25 +44,21 @@
             margin-bottom: 24px;
             position: relative;
         }
-
         .form-row {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-
         .form-group {
             flex: 1;
             min-width: 200px;
             margin-bottom: 15px;
         }
-
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-
         input[type="text"], input[type="date"], select, textarea {
             width: 100%;
             padding: 10px;
@@ -76,12 +67,10 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-
         textarea {
             height: 120px;
             resize: vertical;
         }
-
         button {
             background-color: var(--primary-color);
             color: white;
@@ -93,11 +82,9 @@
             width: 100%;
             transition: background 0.3s;
         }
-
         button:hover {
             background-color: #357abd;
         }
-
         .filter-section {
             display: flex;
             align-items: center;
@@ -108,7 +95,6 @@
             border-radius: 6px;
             flex-wrap: wrap;
         }
-
         .filter-group {
             display: flex;
             align-items: center;
@@ -116,33 +102,27 @@
             flex: 1;
             min-width: 240px;
         }
-
         .filter-group label {
             margin-bottom: 0;
             white-space: nowrap;
         }
-
         .table-responsive {
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             text-align: left;
         }
-
         th, td {
             padding: 12px;
             border-bottom: 1px solid #eeeeee;
         }
-
         th {
             background-color: #f8f9fa;
             color: #555;
         }
-
         .badge {
             background-color: #e1f0fe;
             color: var(--primary-color);
@@ -151,18 +131,15 @@
             font-size: 14px;
             font-weight: bold;
         }
-
         .btn-delete {
             background-color: var(--danger-color);
             padding: 6px 12px;
             font-size: 14px;
             width: auto;
         }
-
         .btn-delete:hover {
             background-color: #d15a63;
         }
-
         .btn-export {
             background-color: var(--success-color);
             width: auto;
@@ -172,11 +149,9 @@
             align-items: center;
             gap: 6px;
         }
-
         .btn-export:hover {
             background-color: #27ae60;
         }
-
         .btn-backup {
             background-color: #9b59b6;
             width: auto;
@@ -186,11 +161,9 @@
             align-items: center;
             gap: 6px;
         }
-
         .btn-backup:hover {
             background-color: #8e44ad;
         }
-
         .btn-restore {
             background-color: #34495e;
             width: auto;
@@ -200,24 +173,20 @@
             align-items: center;
             gap: 6px;
         }
-
         .btn-restore:hover {
             background-color: #2c3e50;
         }
-
         .btn-toggle {
             background-color: #6c757d;
             font-size: 14px;
             padding: 8px 16px;
             width: auto;
         }
-
         .no-data {
             text-align: center;
             color: #888;
             padding: 20px;
         }
-
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -228,13 +197,11 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-
         .action-buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-
         .clean-alert {
             background-color: #fff3cd;
             color: #856404;
@@ -247,14 +214,12 @@
             gap: 8px;
             border: 1px solid #ffeeba;
         }
-
         .roster-card {
             background: #f8f9fa;
             border: 1px dashed var(--primary-color);
             display: none;
             margin-top: 15px;
         }
-        
         .manage-class-box {
             display: flex; 
             gap: 10px; 
@@ -263,6 +228,40 @@
             border-radius: 4px;
             align-items: center;
             margin-bottom: 15px;
+        }
+
+        /* 📅 新增家課部分專屬樣式 */
+        .homework-display-card {
+            background: #fffdf0;
+            border: 1px solid #ffe58f;
+            border-left: 5px solid var(--warning-color);
+        }
+        .homework-list {
+            margin: 10px 0;
+            padding-left: 20px;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        .homework-list li {
+            margin-bottom: 5px;
+        }
+        .btn-copy {
+            background-color: var(--warning-color);
+            width: auto;
+            padding: 6px 12px;
+            font-size: 14px;
+            float: right;
+        }
+        .btn-copy:hover {
+            background-color: #e08e0b;
+        }
+        .homework-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #ffe58f;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -295,7 +294,6 @@
             <input type="text" id="newClassInput" placeholder="例如：4A" style="width: 150px; padding: 6px;">
             <button id="addClassBtn" style="width: auto; padding: 6px 15px; background: #28a745;">加入</button>
         </div>
-
         <p style="font-size: 14px; color: #666; margin-top: 10px;">請選擇班別以「編輯學生名單」或「刪除該班別」：</p>
         
         <div class="form-row">
@@ -316,6 +314,48 @@
             <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">💾 儲存該班名單</button>
             <button id="closeRosterBtn" style="width: auto; background-color: #6c757d;">收起設定</button>
         </div>
+    </div>
+
+    <!-- 📅 【新增部分】：每日家課（功課）展示板 -->
+    <div class="card homework-display-card">
+        <div class="homework-header">
+            <h3 style="margin: 0; color: #b78103; display: flex; align-items: center; gap: 8px;">📅 每日家課（功課）展示板</h3>
+            <button id="copyHomeworkBtn" class="btn-copy">📋 一鍵複製家課</button>
+        </div>
+        <div style="font-size: 15px; font-weight: bold; color: #666; margin-bottom: 10px;">
+            班別：<span id="hwDisplayClass" class="badge" style="background-color: #ffe58f; color: #b78103; font-size: 15px;">-</span> 
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            日期：<span id="hwDisplayDate" style="color: #333;">-</span>
+        </div>
+        <div id="noHomeworkMessage" class="no-data" style="color: #9e7403; background: none; padding: 10px;">今天此班級暫無發佈家課 👍</div>
+        <ol id="homeworkDisplayList" class="homework-list" style="display: none;">
+            <!-- JavaScript 動態插入家課項目 -->
+        </ol>
+    </div>
+
+    <!-- 【新增部分】：輸入每天家課（功課）表單 -->
+    <div class="card" style="border-top: 4px solid var(--warning-color);">
+        <h3 style="color: #d48806;">📝 發佈每日家課</h3>
+        <form id="dailyHomeworkForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="homeworkDate">發佈日期</label>
+                    <input type="date" id="homeworkDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="homeworkClassSelect">發佈班別</label>
+                    <select id="homeworkClassSelect" required>
+                        <option value="" disabled selected>請選擇班別</option>
+                        <!-- JavaScript 動態載入 -->
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="homeworkContent">家課（功課）內容（每行一項功課，支援換行）</label>
+                <textarea id="homeworkContent" placeholder="例如：&#10;1. 中文工作紙 (三)&#10;2. 數學書 P.12 習題 1-5&#10;3. 溫習英文單詞 Unit 2" required></textarea>
+            </div>
+            <button type="submit" style="background-color: var(--warning-color);">💾 發佈並儲存家課</button>
+        </form>
     </div>
 
     <!-- 輸入表單 -->
@@ -354,7 +394,6 @@
     <!-- 數據顯示列表 -->
     <div class="card">
         <h3>📋 欠交功課列表</h3>
-
         <div class="filter-section">
             <div class="filter-group">
                 <label for="classFilter">🔍 班別：</label>
@@ -377,7 +416,6 @@
                 </select>
             </div>
         </div>
-
         <div class="stats-bar">
             <span id="totalCount">總計欠交：0 筆</span>
             <div class="action-buttons">
@@ -440,9 +478,22 @@
     const addClassBtn = document.getElementById('addClassBtn');
     const deleteClassBtn = document.getElementById('deleteClassBtn');
 
+    // 📅 【新增家課功能】 DOM 元素
+    const dailyHomeworkForm = document.getElementById('dailyHomeworkForm');
+    const homeworkDateInput = document.getElementById('homeworkDate');
+    const homeworkClassSelect = document.getElementById('homeworkClassSelect');
+    const homeworkContentInput = document.getElementById('homeworkContent');
+    
+    const hwDisplayClass = document.getElementById('hwDisplayClass');
+    const hwDisplayDate = document.getElementById('hwDisplayDate');
+    const noHomeworkMessage = document.getElementById('noHomeworkMessage');
+    const homeworkDisplayList = document.getElementById('homeworkDisplayList');
+    const copyHomeworkBtn = document.getElementById('copyHomeworkBtn');
+
     // 設定預設日期為今天
     const today = new Date().toISOString().split('T')[0];
     recordDateInput.value = today;
+    homeworkDateInput.value = today; // 發佈家課日期也預設為今天
 
     // 從 localStorage 讀取核心資料
     let records = JSON.parse(localStorage.getItem('homeworkRecords')) || [];
@@ -450,7 +501,10 @@
     cleanPolicy.value = savedPolicy;
     let studentRosters = JSON.parse(localStorage.getItem('studentRosters')) || {};
     
-    // 預設班別列表 (若無資料則提供預設)
+    // 📅 【新增家課功能】 讀取家課數據資料庫 (格式: { "2026-09-22___1A": ["1. 中文工作紙", "2. 英文書"] })
+    let dailyHomeworkDb = JSON.parse(localStorage.getItem('dailyHomeworkDb')) || {};
+
+    // 預設班別列表
     let classList = JSON.parse(localStorage.getItem('homeworkClasses')) || ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
 
     // ==========================================
@@ -465,6 +519,13 @@
         const currentRecordClass = studentClassInput.value;
         studentClassInput.innerHTML = recordClassHtml;
         if (classList.includes(currentRecordClass)) studentClassInput.value = currentRecordClass;
+
+        // 📅 【新增家課功能】：家課表單的班別
+        let hwFormClassHtml = '<option value="" disabled selected>請選擇班別</option>';
+        classList.forEach(cls => { hwFormClassHtml += `<option value="${cls}">${cls}</option>`; });
+        const currentHwFormClass = homeworkClassSelect.value;
+        homeworkClassSelect.innerHTML = hwFormClassHtml;
+        if (classList.includes(currentHwFormClass)) homeworkClassSelect.value = currentHwFormClass;
 
         // 2. 篩選器的班別
         let filterClassHtml = '<option value="ALL">顯示所有班別</option>';
@@ -508,7 +569,6 @@
         if (classList.includes(newClass)) return alert('此班別已經存在！');
         
         classList.push(newClass);
-        // 自動排序一下會比較好看
         classList.sort(); 
         
         localStorage.setItem('homeworkClasses', JSON.stringify(classList));
@@ -524,7 +584,6 @@
     deleteClassBtn.addEventListener('click', () => {
         const targetClass = rosterClassSelect.value;
         if (!targetClass) return;
-
         if (confirm(`⚠️ 警告：確定要刪除「${targetClass}」班嗎？\n刪除後，該班的學生名單設定將被清除（但已登記的欠交記錄仍會保留）。`)) {
             classList = classList.filter(cls => cls !== targetClass);
             delete studentRosters[targetClass]; // 清除該班名單
@@ -569,18 +628,15 @@
     function updateStudentDropdown() {
         const selectedClass = studentClassInput.value;
         studentNameSelect.innerHTML = '';
-
         if (!selectedClass) {
             studentNameSelect.innerHTML = '<option value="" disabled selected>請先選擇班別</option>';
             return;
         }
-
         const classList = studentRosters[selectedClass] || [];
         if (classList.length === 0) {
             studentNameSelect.innerHTML = '<option value="" disabled selected>⚠️ 此班級尚未建立名單</option>';
             return;
         }
-
         let optionsHtml = '<option value="" disabled selected>請選取學生</option>';
         classList.forEach(student => {
             optionsHtml += `<option value="${escapeHtml(student)}">${escapeHtml(student)}</option>`;
@@ -589,11 +645,109 @@
         studentNameSelect.innerHTML = optionsHtml;
     }
 
-    // --- 以下為數據統計、清理與渲染邏輯 ---
+    // ==========================================
+    // 📅 【新增部分】：每日家課發佈與動態渲染邏輯
+    // ==========================================
+    
+    // 當發佈表單提交時
+    dailyHomeworkForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const date = homeworkDateInput.value;
+        const cls = homeworkClassSelect.value;
+        const rawContent = homeworkContentInput.value.trim();
+        
+        if (!cls) return alert('請先選擇發佈班別！');
+        
+        // 將家課內容按行分割為陣列，過濾空白行
+        const homeworkList = rawContent.split('\n')
+                                        .map(item => item.trim())
+                                        .filter(item => item.length > 0);
+        
+        // 儲存至資料庫
+        const key = `${date}___${cls}`;
+        dailyHomeworkDb[key] = homeworkList;
+        localStorage.setItem('dailyHomeworkDb', JSON.stringify(dailyHomeworkDb));
+        
+        // 清空輸入框（保留日期與班別，方便修改）
+        homeworkContentInput.value = '';
+        
+        alert(`🎉 成功儲存及發佈 ${cls} 班於 ${date} 的家課！`);
+        
+        // 更新當前展示板
+        renderDailyHomeworkBoard();
+    });
+
+    // 依據列表篩選器連動渲染家課展示板
+    function renderDailyHomeworkBoard() {
+        // 連動：讀取下方欠交列表的篩選器「班別」，若為 ALL 則預設為班級選單的第一個
+        let selectedClass = classFilter.value;
+        if (selectedClass === 'ALL') {
+            selectedClass = classList[0] || '-';
+        }
+        
+        // 連動：日期與下方登記日期或今天同步
+        const selectedDate = recordDateInput.value || today;
+
+        hwDisplayClass.textContent = selectedClass;
+        hwDisplayDate.textContent = selectedDate;
+
+        const key = `${selectedDate}___${selectedClass}`;
+        const homeworkList = dailyHomeworkDb[key];
+
+        if (!homeworkList || homeworkList.length === 0) {
+            noHomeworkMessage.style.display = 'block';
+            homeworkDisplayList.style.display = 'none';
+            return;
+        }
+
+        noHomeworkMessage.style.display = 'none';
+        homeworkDisplayList.innerHTML = '';
+        
+        homeworkList.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            homeworkDisplayList.appendChild(li);
+        });
+        homeworkDisplayList.style.display = 'ol';
+    }
+
+    // 一鍵複製當天家課（方便貼到通訊軟體）
+    copyHomeworkBtn.addEventListener('click', function() {
+        const selectedClass = hwDisplayClass.textContent;
+        const selectedDate = hwDisplayDate.textContent;
+        const key = `${selectedDate}___${selectedClass}`;
+        const homeworkList = dailyHomeworkDb[key];
+
+        if (!homeworkList || homeworkList.length === 0) {
+            return alert('沒有可以複製的家課內容！');
+        }
+
+        let copyText = `🏫 聖公會蔡功譜中學\n📚 ${selectedClass} 班 每日家課表\n📅 日期：${selectedDate}\n\n`;
+        homeworkList.forEach(item => {
+            copyText += `${item}\n`;
+        });
+
+        // 複製到剪貼簿
+        navigator.clipboard.writeText(copyText).then(() => {
+            alert('📋 家課表已複製至剪貼簿，可以直接貼到 WhatsApp 或 Teams 群組！');
+        }).catch(err => {
+            alert('複製失敗，請手動複製網頁上的家課內容。');
+        });
+    });
+
+    // 監聽下方登記日期和班別篩選器，讓家課板即時動態連動
+    recordDateInput.addEventListener('change', renderDailyHomeworkBoard);
+    classFilter.addEventListener('change', renderDailyHomeworkBoard);
+
+
+    // ==========================================
+    // --- 數據統計、清理與渲染邏輯 ---
+    // ==========================================
+
     function autoCleanRecords() {
         const policy = cleanPolicy.value;
         if (policy === 'NEVER') return;
-
         const daysLimit = parseInt(policy);
         const todayDate = new Date();
         const limitDate = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate() - daysLimit);
@@ -604,9 +758,7 @@
             const recordDate = new Date(record.date);
             return recordDate >= limitDate;
         });
-
         const deletedCount = originalLength - records.length;
-
         if (deletedCount > 0) {
             localStorage.setItem('homeworkRecords', JSON.stringify(records));
             cleanedCountSpan.textContent = deletedCount;
@@ -620,7 +772,6 @@
     function getFilteredRecords() {
         const selectedClass = classFilter.value;
         const searchQuery = nameSearch.value.trim().toLowerCase();
-
         return records.filter(record => {
             const matchesClass = (selectedClass === 'ALL' || record.className === selectedClass);
             const matchesName = record.name.toLowerCase().includes(searchQuery);
@@ -634,14 +785,12 @@
         const searchQuery = nameSearch.value.trim().toLowerCase();
         
         const filteredRecords = getFilteredRecords();
-
         if (filteredRecords.length === 0) {
             noDataMessage.style.display = 'block';
             totalCountSpan.textContent = '找到 0 筆相關記錄';
             exportBtn.style.display = 'none';
             return;
         }
-
         noDataMessage.style.display = 'none';
         exportBtn.style.display = 'inline-flex';
         
@@ -656,9 +805,7 @@
             statsText = `總計欠交：${filteredRecords.length} 筆`;
         }
         totalCountSpan.textContent = statsText;
-
         const sortedRecords = [...filteredRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
-
         sortedRecords.forEach((record) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -682,7 +829,6 @@
 
     recordForm.addEventListener('submit', function(e) {
         e.preventDefault();
-
         const newRecord = {
             id: Date.now().toString(),
             date: recordDateInput.value,
@@ -690,7 +836,6 @@
             name: studentNameSelect.value,
             item: homeworkItemInput.value.trim()
         };
-
         records.push(newRecord);
         localStorage.setItem('homeworkRecords', JSON.stringify(records));
         
@@ -701,7 +846,6 @@
 
     classFilter.addEventListener('change', renderTable);
     nameSearch.addEventListener('input', renderTable);
-
     cleanPolicy.addEventListener('change', function() {
         localStorage.setItem('homeworkCleanPolicy', cleanPolicy.value);
         autoCleanRecords();
@@ -726,14 +870,12 @@
     exportBtn.addEventListener('click', function() {
         const filteredRecords = getFilteredRecords();
         if (filteredRecords.length === 0) return;
-
         let csvContent = "\uFEFF登記日期,班別,學生姓名,欠交項目\n";
         filteredRecords.forEach(record => {
             const safeName = `"${record.name.replace(/"/g, '""')}"`;
             const safeItem = `"${record.item.replace(/"/g, '""')}"`;
             csvContent += `${record.date},${record.className},${safeName},${safeItem}\n`;
         });
-
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -749,21 +891,20 @@
         document.body.removeChild(link);
     });
 
-    // 導出備份 (打包班別、記錄與學生名單)
+    // 導出備份 (打包班別、記錄、家課與學生名單)
     exportBackupBtn.addEventListener('click', function() {
         const backupData = {
             classes: classList,
             records: records,
             studentRosters: studentRosters,
+            dailyHomeworkDb: dailyHomeworkDb, // 📅 【新增家課功能】一併導出備份
             policy: cleanPolicy.value,
             backupTime: new Date().toLocaleString()
         };
-
         const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         const exportDate = new Date().toISOString().split('T')[0];
-
         link.setAttribute("href", url);
         link.setAttribute("download", `homework_backup_${exportDate}.json`);
         link.style.visibility = 'hidden';
@@ -779,51 +920,30 @@
     fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const importedData = JSON.parse(e.target.result);
                 
                 if (importedData.records && importedData.studentRosters) {
-                    if (confirm(`已偵測到備份檔案（備份時間：${importedData.backupTime || '未知'}）。\n這將會覆蓋您目前設備上的所有欠交數據、自訂班別及學生名冊，確定要導入嗎？`)) {
+                    if (confirm(`已偵測到備份檔案（備份時間：${importedData.backupTime || '未知'}）。\n這將會覆蓋您目前設備上的所有欠交數據、自訂班別、每日家課及學生名冊，確定要導入嗎？`)) {
                         
                         // 覆蓋本地資料
                         records = importedData.records;
                         studentRosters = importedData.studentRosters;
                         if (importedData.classes) classList = importedData.classes; // 恢復班別
+                        if (importedData.dailyHomeworkDb) dailyHomeworkDb = importedData.dailyHomeworkDb; // 📅 恢復家課
+                        
                         if (importedData.policy) {
                             cleanPolicy.value = importedData.policy;
                             localStorage.setItem('homeworkCleanPolicy', importedData.policy);
                         }
-
                         // 儲存至本地瀏覽器
                         localStorage.setItem('homeworkRecords', JSON.stringify(records));
                         localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
                         localStorage.setItem('homeworkClasses', JSON.stringify(classList));
+                        localStorage.setItem('dailyHomeworkDb', JSON.stringify(dailyHomeworkDb));
 
                         // 重新加載介面
-                        renderClassDropdowns();
-                        updateStudentDropdown();
-                        renderTable();
-                        alert('🎉 數據、自訂班別與學生名冊成功導入並同步！');
-                    }
-                } else {
-                    alert('❌ 導入失敗：此檔案非本系統專用的備份格式。');
-                }
-            } catch (err) {
-                alert('❌ 導入失敗：無法解析該備份檔案。');
-            }
-            fileInput.value = '';
-        };
-        reader.readAsText(file);
-    });
+                        rende
 
-    // 啟動流程：渲染班別選單 -> 清理舊資料 -> 渲染表格
-    renderClassDropdowns();
-    autoCleanRecords();
-    renderTable();
-</script>
-
-</body>
-</html>
