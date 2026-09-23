@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (一鍵活化版)</title>
+    <title>聖公會蔡功譜中學 - 學生欠交功課統計系統 (終極完美版)</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -26,7 +26,7 @@
         }
         .container {
             width: 100%;
-            max-width: 950px;
+            max-width: 1050px;
         }
         header {
             text-align: center;
@@ -131,15 +131,21 @@
             font-size: 14px;
             font-weight: bold;
         }
-        .btn-delete {
-            background-color: var(--danger-color);
-            padding: 6px 12px;
-            font-size: 14px;
+        .btn-action {
+            padding: 6px 10px;
+            font-size: 13px;
             width: auto;
+            border-radius: 4px;
+            margin-right: 4px;
+            margin-bottom: 4px;
         }
-        .btn-delete:hover {
-            background-color: #d15a63;
-        }
+        .btn-resolve { background-color: #28a745; }
+        .btn-resolve:hover { background-color: #218838; }
+        .btn-undo { background-color: #f39c12; }
+        .btn-undo:hover { background-color: #e67e22; }
+        .btn-delete { background-color: var(--danger-color); }
+        .btn-delete:hover { background-color: #d15a63; }
+
         .btn-export, .btn-backup, .btn-restore {
             width: auto;
             padding: 8px 16px;
@@ -154,12 +160,13 @@
         .btn-backup:hover { background-color: #8e44ad; }
         .btn-restore { background-color: #34495e; }
         .btn-restore:hover { background-color: #2c3e50; }
+        
         .btn-toggle {
-            background-color: #6c757d;
             font-size: 14px;
             padding: 8px 16px;
             width: auto;
         }
+
         .no-data {
             text-align: center;
             color: #888;
@@ -198,6 +205,13 @@
             display: none;
             margin-top: 15px;
         }
+        .leaderboard-card {
+            background: #fffdf8;
+            border: 1px solid var(--warning-color);
+            border-top: 4px solid var(--warning-color);
+            display: none;
+            margin-top: 15px;
+        }
         .manage-class-box {
             display: flex; 
             gap: 10px; 
@@ -207,7 +221,48 @@
             align-items: center;
             margin-bottom: 15px;
         }
-        /* 📅 家課展示板樣式 */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        .status-pending { background-color: #fce4e4; color: #c0392b; }
+        .status-resolved { background-color: #e8f8f5; color: #27ae60; }
+        
+        .resolved-item {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        /* 批次匯出入選項卡 */
+        .roster-tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .roster-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #e9ecef;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .roster-tab.active {
+            background: #fff;
+            color: var(--primary-color);
+            border-top: 3px solid var(--primary-color);
+            padding-bottom: 11px;
+            margin-bottom: -2px;
+        }
+
+        /* 家課展示板專屬樣式 */
         .homework-display-card {
             background: #fffdf0;
             border: 1px solid #ffe58f;
@@ -219,18 +274,14 @@
             line-height: 1.8;
             font-size: 16px;
         }
-        .homework-list li {
-            margin-bottom: 5px;
-        }
+        .homework-list li { margin-bottom: 5px; }
         .btn-copy {
             background-color: var(--warning-color);
             width: auto;
             padding: 6px 12px;
             font-size: 14px;
         }
-        .btn-copy:hover {
-            background-color: #e08e0b;
-        }
+        .btn-copy:hover { background-color: #e08e0b; }
         .homework-header {
             display: flex;
             justify-content: space-between;
@@ -239,7 +290,6 @@
             padding-bottom: 10px;
             margin-bottom: 15px;
         }
-        /* 獨立檢索區塊樣式 */
         .hw-filter-bar {
             display: flex;
             gap: 15px;
@@ -263,64 +313,122 @@
 <div class="container">
     <header>
         <h1>🏫 聖公會蔡功譜中學</h1>
-        <h2>📝 學生欠交功課統計系統 (家課版)</h2>
-        <p>自訂班別與名單、無伺服器保密、支援一鍵備份與匯出</p>
+        <h2>📝 學生欠交功課統計系統 (終極完美版)</h2>
+        <p>追蹤補交過程、家課發佈、大批次名單與一鍵備份</p>
     </header>
 
-    <!-- 🌟 重建系統核心數據一鍵活化按鈕 (排除髒數據必備) -->
+    <!-- 一鍵活化修復按鈕 -->
     <div style="background-color: #e6f7ff; border: 1px solid #91d5ff; padding: 15px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
-        <span style="font-size: 15px; color: #1890ff; font-weight: bold;">⚠️ 網頁沒反應？</span>
-        <span style="font-size: 14px; color: #555;">如果您的網頁因先前舊資料損壞而導致按鈕無反應，請點擊：</span>
+        <span style="font-size: 15px; color: #1890ff; font-weight: bold;">⚠️ 網頁沒反應或卡住？</span>
+        <span style="font-size: 14px; color: #555;">請點擊右方按鈕，即可瞬間修復所有功能：</span>
         <button id="forceResetBtn" style="background-color: #1890ff; width: auto; padding: 6px 15px; font-size: 14px; margin-left: 10px;">⚡ 一鍵修復並活化系統</button>
     </div>
 
-    <!-- 自動清理通知欄 -->
     <div id="cleanAlert" class="clean-alert">
-        ⚠️ <strong>系統通知：</strong> 系統已自動為您清除 <span id="cleanedCount">0</span> 筆過期的記錄！
+        ⚠️ <strong>系統通知：</strong> 系統已自動為您清除 <span id="cleanedCount">0</span> 筆過期的本地記錄！
     </div>
 
-    <!-- 頂部按鈕：控制展開「班別與名單管理」 -->
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-        <button id="toggleRosterBtn" class="btn-toggle">⚙️ 管理班別與學生名冊</button>
+    <!-- 頂部功能切換按鈕區塊 -->
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
+        <button id="toggleLeaderboardBtn" class="btn-toggle" style="background-color: var(--warning-color); color: #fff;">📊 查看欠交次數排行榜</button>
+        <button id="toggleRosterBtn" class="btn-toggle" style="background-color: #6c757d; color: #fff;">⚙️ 管理班別與學生名冊</button>
     </div>
 
-    <!-- 班別與學生名單管理區塊 -->
+    <!-- 📊 排行榜區塊 -->
+    <div id="leaderboardCard" class="card leaderboard-card">
+        <h3>🏆 學生欠交次數排行榜</h3>
+        <p style="font-size: 14px; color: #666;">系統會自動計算每位學生的欠交總次數，並依照<strong>「🔴 目前未交」</strong>次數由多到少進行排名。</p>
+        
+        <div class="filter-section" style="background: #fff3cd; border: 1px solid #ffeeba;">
+            <div class="filter-group">
+                <label for="leaderboardClassFilter">🔍 篩選班別：</label>
+                <select id="leaderboardClassFilter">
+                    <option value="ALL">顯示全校總排行</option>
+                </select>
+            </div>
+            <button id="exportLeaderboardBtn" class="btn-export" style="margin-left: auto;">📥 匯出排行榜 Excel</button>
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%">排名</th>
+                        <th style="width: 12%">班別</th>
+                        <th style="width: 12%">學號</th>
+                        <th style="width: 20%">學生姓名</th>
+                        <th style="width: 15%; color: #c0392b;">🔴 目前未交</th>
+                        <th style="width: 15%; color: #27ae60;">🟢 已補交</th>
+                        <th style="width: 16%">總欠交記錄</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardTableBody">
+                </tbody>
+            </table>
+            <div id="noLeaderboardMessage" class="no-data">目前沒有任何欠交記錄 👍</div>
+        </div>
+    </div>
+
+    <!-- ⚙️ 班別與學生名單管理區塊 -->
     <div id="rosterCard" class="card roster-card">
         <h3>👥 班別與學生名冊管理</h3>
         
-        <div class="manage-class-box">
-            <strong style="white-space: nowrap;">✨ 新增班別：</strong>
-            <input type="text" id="newClassInput" placeholder="例如：4A" style="width: 150px; padding: 6px;">
-            <button id="addClassBtn" style="width: auto; padding: 6px 15px; background: #28a745;">加入</button>
+        <!-- 選項卡 -->
+        <div class="roster-tabs">
+            <div id="tabSingle" class="roster-tab active">🏫 按班級個別設定</div>
+            <div id="tabBatch" class="roster-tab">📋 全校大批次一次過匯入</div>
         </div>
-        <p style="font-size: 14px; color: #666; margin-top: 10px;">請選擇班別以「編輯學生名單」或「刪除該班別」：</p>
-        
-        <div class="form-row">
-            <div class="form-group" style="flex: 1;">
-                <label for="rosterClassSelect">選擇班別</label>
-                <select id="rosterClassSelect"></select>
-                <button id="deleteClassBtn" class="btn-delete" style="margin-top: 10px; width: 100%;">🗑️ 刪除此班別</button>
+
+        <!-- 分頁 1：個別設定 -->
+        <div id="singleClassSection">
+            <div class="manage-class-box">
+                <strong style="white-space: nowrap;">✨ 新增班別：</strong>
+                <input type="text" id="newClassInput" placeholder="例如：4A" style="width: 150px; padding: 6px;">
+                <button id="addClassBtn" style="width: auto; padding: 6px 15px; background: #28a745;">加入</button>
             </div>
-            <div class="form-group" style="flex: 3;">
-                <label for="rosterTextArea">該班學生名單（每行一人）</label>
-                <textarea id="rosterTextArea" placeholder="請先在左側選擇班別，然後在此貼上名字..."></textarea>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                💡 <strong>輸入規範：</strong>請使用<strong>「學號 + 空格 + 姓名」</strong>的格式（例如：<code>01 陳大文</code>）。
+            </p>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label for="rosterClassSelect">選擇班別</label>
+                    <select id="rosterClassSelect"></select>
+                    <button id="deleteClassBtn" class="btn-delete" style="margin-top: 10px; width: 100%;">🗑️ 刪除此班別</button>
+                </div>
+                <div class="form-group" style="flex: 3;">
+                    <label for="rosterTextArea">該班學生名單（每行一人）</label>
+                    <textarea id="rosterTextArea" placeholder="01 陳大文&#10;02 張小明&#10;03 李美美"></textarea>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">💾 儲存該班名單</button>
+                <button id="closeRosterBtn" style="width: auto; background-color: #6c757d;">收起設定</button>
             </div>
         </div>
-        
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-            <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">💾 儲存該班名單</button>
-            <button id="closeRosterBtn" style="width: auto; background-color: #6c757d;">收起設定</button>
+
+        <!-- 分頁 2：大批次匯入 -->
+        <div id="batchClassSection" style="display: none;">
+            <p style="font-size: 14px; color: #333; font-weight: bold; background: #eef2f7; padding: 10px; border-radius: 4px; border-left: 4px solid var(--primary-color);">
+                💡 請直接從 Excel 複製總名冊並貼在下方。<br>
+                格式必須是：<strong>「班別 + 空格 + 學號 + 空格 + 姓名」</strong>（系統會自動解析並分配班級）。
+            </p>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="batchRosterTextArea">📋 在此貼上全校總名單</label>
+                <textarea id="batchRosterTextArea" style="height: 250px;" placeholder="1A 01 陳大文&#10;1A 02 張小明&#10;1B 01 李美美&#10;2A 15 黃小強"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
+                <button id="saveBatchRosterBtn" style="width: auto; background-color: var(--success-color);">⚡ 立即解析並匯入</button>
+                <button id="closeRosterBtn2" style="width: auto; background-color: #6c757d;">收起設定</button>
+            </div>
         </div>
     </div>
 
-    <!-- 📅 每日家課展示板 (新增獨立檢索) -->
+    <!-- 📅 獨立檢索的：每日家課展示板 -->
     <div class="card homework-display-card">
         <div class="homework-header">
             <h3 style="margin: 0; color: #b78103;">📅 每日家課（功課）展示板</h3>
             <button id="copyHomeworkBtn" class="btn-copy">📋 一鍵複製</button>
         </div>
-
-        <!-- 專屬檢索工具列 -->
         <div class="hw-filter-bar">
             <div class="filter-group">
                 <label for="hwDisplayDateFilter" style="color: #b78103;">📅 檢索日期：</label>
@@ -328,12 +436,9 @@
             </div>
             <div class="filter-group">
                 <label for="hwDisplayClassFilter" style="color: #b78103;">🏫 檢索班別：</label>
-                <select id="hwDisplayClassFilter" style="padding: 6px;">
-                    <!-- JS 動態載入 -->
-                </select>
+                <select id="hwDisplayClassFilter" style="padding: 6px;"></select>
             </div>
         </div>
-
         <div id="noHomeworkMessage" class="no-data" style="color: #9e7403; background: none; padding: 10px;">此班級於該日期暫無家課 👍</div>
         <ol id="homeworkDisplayList" class="homework-list" style="display: none;"></ol>
     </div>
@@ -380,7 +485,7 @@
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label for="studentNameSelect">學生姓名</label>
+                    <label for="studentNameSelect">選擇學生</label>
                     <select id="studentNameSelect" required>
                         <option value="" disabled selected>請先選擇班別</option>
                     </select>
@@ -396,8 +501,25 @@
 
     <!-- 📋 數據顯示列表 -->
     <div class="card">
-        <h3>📋 欠交功課列表</h3>
+        <h3>📋 欠交與補交記錄列表</h3>
+
         <div class="filter-section">
+            <div class="filter-group">
+                <label for="statusFilter">📋 狀態：</label>
+                <select id="statusFilter" style="font-weight: bold; color: var(--primary-color);">
+                    <option value="pending" selected>🔴 僅顯示未交</option>
+                    <option value="resolved">🟢 僅顯示已補交</option>
+                    <option value="ALL">顯示全部記錄</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="sortOrder">↕️ 排序：</label>
+                <select id="sortOrder">
+                    <option value="dateDesc">按日期 (最新至最舊)</option>
+                    <option value="nameAsc">按學號排序 (由小至大)</option>
+                    <option value="classAndName">按班別 + 學號 (推薦導出用)</option>
+                </select>
+            </div>
             <div class="filter-group">
                 <label for="classFilter">🔍 班別：</label>
                 <select id="classFilter">
@@ -405,27 +527,28 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="nameSearch">👤 姓名搜尋：</label>
-                <input type="text" id="nameSearch" placeholder="請輸入姓名關鍵字...">
+                <label for="nameSearch">👤 搜尋：</label>
+                <input type="text" id="nameSearch" placeholder="請輸入關鍵字...">
             </div>
             <div class="filter-group">
-                <label for="cleanPolicy">📅 歷史數據保留：</label>
+                <label for="cleanPolicy">📅 歷史保留：</label>
                 <select id="cleanPolicy">
-                    <option value="7">只保留最近 7 天 (按週)</option>
-                    <option value="30" selected>只保留最近 30 天 (按月)</option>
-                    <option value="90">只保留最近 90 天 (按季)</option>
-                    <option value="NEVER">不自動清除 (永久保留)</option>
+                    <option value="7">只保留最近 7 天</option>
+                    <option value="30" selected>只保留最近 30 天</option>
+                    <option value="90">只保留最近 90 天</option>
+                    <option value="NEVER">不自動清除 (永久)</option>
                 </select>
             </div>
         </div>
+
         <div class="stats-bar">
-            <span id="totalCount">總計欠交：0 筆</span>
+            <span id="totalCount">總計：0 筆</span>
             <div class="action-buttons">
                 <button id="exportBtn" class="btn-export">📥 匯出 Excel 報表</button>
-                <button id="exportBackupBtn" class="btn-backup">📤 導出數據備份</button>
-                <button id="importBackupBtn" class="btn-restore">📥 導入數據備份</button>
+                <button id="exportBackupBtn" class="btn-backup">📤 導出備份</button>
+                <button id="importBackupBtn" class="btn-restore">📥 導入備份</button>
                 <input type="file" id="fileInput" accept=".json" style="display: none;">
-                <button id="clearAllBtn" class="btn-delete" style="width: auto; padding: 5px 10px;">清除所有數據</button>
+                <button id="clearFilteredResolvedBtn" class="btn-delete" style="width: auto; padding: 5px 10px;">🧹 清除已補交記錄</button>
             </div>
         </div>
         
@@ -433,314 +556,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 20%">時間</th>
-                        <th style="width: 15%">班別</th>
-                        <th style="width: 20%">學生姓名</th>
-                        <th style="width: 30%">欠交項目</th>
-                        <th style="width: 15%">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="recordTableBody">
-                </tbody>
-            </table>
-            <div id="noDataMessage" class="no-data">目前沒有符合篩選或搜尋條件的記錄 👍</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // 核心數據讀取 (防呆)
-    let records = [];
-    let studentRosters = {};
-    let dailyHomeworkDb = {};
-    let classList = [];
-    
-    function loadDataFromStorage() {
-        try { records = JSON.parse(localStorage.getItem('homeworkRecords')) || []; } catch(e) { records = []; }
-        try { studentRosters = JSON.parse(localStorage.getItem('studentRosters')) || {}; } catch(e) { studentRosters = {}; }
-        try { dailyHomeworkDb = JSON.parse(localStorage.getItem('dailyHomeworkDb')) || {}; } catch(e) { dailyHomeworkDb = {}; }
-        try { 
-            classList = JSON.parse(localStorage.getItem('homeworkClasses'));
-            if (!Array.isArray(classList) || classList.length === 0) {
-                classList = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
-            }
-        } catch(e) { 
-            classList = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C']; 
-        }
-    }
-
-    loadDataFromStorage();
-
-    // 綁定 DOM 元素
-    const recordForm = document.getElementById('recordForm');
-    const recordDateInput = document.getElementById('recordDate');
-    const studentClassInput = document.getElementById('studentClass');
-    const studentNameSelect = document.getElementById('studentNameSelect');
-    const homeworkItemInput = document.getElementById('homeworkItem');
-    const classFilter = document.getElementById('classFilter');
-    const nameSearch = document.getElementById('nameSearch');
-    const cleanPolicy = document.getElementById('cleanPolicy');
-    const cleanAlert = document.getElementById('cleanAlert');
-    const cleanedCountSpan = document.getElementById('cleanedCount');
-    const recordTableBody = document.getElementById('recordTableBody');
-    const noDataMessage = document.getElementById('noDataMessage');
-    const totalCountSpan = document.getElementById('totalCount');
-    const clearAllBtn = document.getElementById('clearAllBtn');
-    const exportBtn = document.getElementById('exportBtn');
-    const exportBackupBtn = document.getElementById('exportBackupBtn');
-    const importBackupBtn = document.getElementById('importBackupBtn');
-    const fileInput = document.getElementById('fileInput');
-
-    const toggleRosterBtn = document.getElementById('toggleRosterBtn');
-    const rosterCard = document.getElementById('rosterCard');
-    const rosterClassSelect = document.getElementById('rosterClassSelect');
-    const rosterTextArea = document.getElementById('rosterTextArea');
-    const saveRosterBtn = document.getElementById('saveRosterBtn');
-    const closeRosterBtn = document.getElementById('closeRosterBtn');
-    const newClassInput = document.getElementById('newClassInput');
-    const addClassBtn = document.getElementById('addClassBtn');
-    const deleteClassBtn = document.getElementById('deleteClassBtn');
-
-    // 家課系統 DOM
-    const dailyHomeworkForm = document.getElementById('dailyHomeworkForm');
-    const homeworkDateInput = document.getElementById('homeworkDate');
-    const homeworkClassSelect = document.getElementById('homeworkClassSelect');
-    const homeworkContentInput = document.getElementById('homeworkContent');
-    const hwDisplayDateFilter = document.getElementById('hwDisplayDateFilter');
-    const hwDisplayClassFilter = document.getElementById('hwDisplayClassFilter');
-    const noHomeworkMessage = document.getElementById('noHomeworkMessage');
-    const homeworkDisplayList = document.getElementById('homeworkDisplayList');
-    const copyHomeworkBtn = document.getElementById('copyHomeworkBtn');
-
-    const forceResetBtn = document.getElementById('forceResetBtn');
-
-    // 預設日期設定
-    const today = new Date().toISOString().split('T')[0];
-    if (recordDateInput) recordDateInput.value = today;
-    if (homeworkDateInput) homeworkDateInput.value = today;
-    if (hwDisplayDateFilter) hwDisplayDateFilter.value = today; // 預設家課展示板日期
-    if (cleanPolicy) cleanPolicy.value = localStorage.getItem('homeworkCleanPolicy') || "30";
-
-    // ==========================================
-    // ⚡ 一鍵活化修復
-    // ==========================================
-    forceResetBtn.addEventListener('click', function() {
-        if (confirm('確定要執行一鍵修復嗎？\n這將重設本地緩存並恢復初始乾淨結構（保證按鈕功能 100% 恢復正常運作！）』')) {
-            localStorage.clear(); 
-            classList = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
-            records = [];
-            studentRosters = {};
-            dailyHomeworkDb = {};
-
-            localStorage.setItem('homeworkClasses', JSON.stringify(classList));
-            localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
-            localStorage.setItem('dailyHomeworkDb', JSON.stringify(dailyHomeworkDb));
-
-            renderClassDropdowns();
-            updateStudentDropdown();
-            renderDailyHomeworkBoard();
-            renderTable();
-            alert('🎉 系統已成功重設並重新活化！');
-        }
-    });
-
-    // ==========================================
-    // 🏫 班別渲染邏輯
-    // ==========================================
-    function renderClassDropdowns() {
-        let optionsHtml = '';
-        classList.forEach(cls => { optionsHtml += `<option value="${cls}">${cls}</option>`; });
-        
-        // 1. 登記欠交的班別
-        const currentRecordClass = studentClassInput.value;
-        studentClassInput.innerHTML = '<option value="" disabled selected>請選擇班別</option>' + optionsHtml;
-        if (classList.includes(currentRecordClass)) studentClassInput.value = currentRecordClass;
-
-        // 2. 登記家課的班別
-        const currentHwClass = homeworkClassSelect.value;
-        homeworkClassSelect.innerHTML = '<option value="" disabled selected>請選擇班別</option>' + optionsHtml;
-        if (classList.includes(currentHwClass)) homeworkClassSelect.value = currentHwClass;
-
-        // 3. 獨立：家課展示板的檢索班別
-        const currentHwDisplayClass = hwDisplayClassFilter.value;
-        hwDisplayClassFilter.innerHTML = classList.length === 0 ? '<option value="" disabled selected>無班別可選</option>' : optionsHtml;
-        if (classList.includes(currentHwDisplayClass)) {
-            hwDisplayClassFilter.value = currentHwDisplayClass;
-        } else if (classList.length > 0) {
-            hwDisplayClassFilter.value = classList[0]; // 預設選第一個班級
-        }
-
-        // 4. 篩選器的班別
-        const currentFilterClass = classFilter.value;
-        classFilter.innerHTML = '<option value="ALL">顯示所有班別</option>' + optionsHtml;
-        if (currentFilterClass === 'ALL' || classList.includes(currentFilterClass)) classFilter.value = currentFilterClass;
-
-        // 5. 設定區塊的班別
-        const currentRosterClass = rosterClassSelect.value;
-        rosterClassSelect.innerHTML = classList.length === 0 ? '<option value="" disabled selected>請先新增班別</option>' : optionsHtml;
-        if (classList.includes(currentRosterClass)) rosterClassSelect.value = currentRosterClass;
-    }
-
-    // ==========================================
-    // ⚙️ 名單管理
-    // ==========================================
-    toggleRosterBtn.addEventListener('click', () => {
-        rosterCard.style.display = rosterCard.style.display === 'block' ? 'none' : 'block';
-        loadRosterToTextarea();
-    });
-    closeRosterBtn.addEventListener('click', () => { rosterCard.style.display = 'none'; });
-
-    addClassBtn.addEventListener('click', () => {
-        const newClass = newClassInput.value.trim().toUpperCase();
-        if (!newClass) return alert('請輸入班別名稱！');
-        if (classList.includes(newClass)) return alert('此班別已經存在！');
-        
-        classList.push(newClass);
-        classList.sort(); 
-        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
-        newClassInput.value = '';
-        
-        renderClassDropdowns();
-        rosterClassSelect.value = newClass;
-        loadRosterToTextarea();
-    });
-
-    deleteClassBtn.addEventListener('click', () => {
-        const targetClass = rosterClassSelect.value;
-        if (!targetClass) return;
-        if (confirm(`確定要刪除「${targetClass}」班嗎？`)) {
-            classList = classList.filter(cls => cls !== targetClass);
-            delete studentRosters[targetClass];
-            localStorage.setItem('homeworkClasses', JSON.stringify(classList));
-            localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
-            renderClassDropdowns();
-            loadRosterToTextarea();
-            updateStudentDropdown();
-            renderDailyHomeworkBoard();
-        }
-    });
-
-    rosterClassSelect.addEventListener('change', loadRosterToTextarea);
-
-    function loadRosterToTextarea() {
-        const cls = rosterClassSelect.value;
-        rosterTextArea.value = (!cls || !studentRosters[cls]) ? '' : studentRosters[cls].join('\n');
-    }
-
-    saveRosterBtn.addEventListener('click', () => {
-        const cls = rosterClassSelect.value;
-        if (!cls) return alert('請選擇一個班別！');
-        const list = rosterTextArea.value.trim().split('\n').map(n => n.trim()).filter(n => n.length > 0);
-        
-        studentRosters[cls] = list;
-        localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
-        alert(`成功儲存 ${cls} 班（共 ${list.length} 人）！`);
-        
-        studentClassInput.value = cls;
-        updateStudentDropdown();
-    });
-
-    studentClassInput.addEventListener('change', updateStudentDropdown);
-
-    function updateStudentDropdown() {
-        const cls = studentClassInput.value;
-        studentNameSelect.innerHTML = '';
-        if (!cls) {
-            studentNameSelect.innerHTML = '<option value="" disabled selected>請先選擇班別</option>';
-            return;
-        }
-        const list = studentRosters[cls] || [];
-        if (list.length === 0) {
-            studentNameSelect.innerHTML = '<option value="" disabled selected>⚠️ 此班尚未建立名單</option>';
-            return;
-        }
-        let html = '<option value="" disabled selected>請選取學生</option>';
-        list.forEach(name => { html += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`; });
-        studentNameSelect.innerHTML = html;
-    }
-
-    // ==========================================
-    // 📅 家課發佈與展示 (完全獨立邏輯)
-    // ==========================================
-    dailyHomeworkForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const date = homeworkDateInput.value;
-        const cls = homeworkClassSelect.value;
-        const content = homeworkContentInput.value.trim();
-        
-        if (!cls) return alert('請選擇發佈班別！');
-        
-        const list = content.split('\n').map(i => i.trim()).filter(i => i.length > 0);
-        dailyHomeworkDb[`${date}___${cls}`] = list;
-        localStorage.setItem('dailyHomeworkDb', JSON.stringify(dailyHomeworkDb));
-        
-        homeworkContentInput.value = '';
-        alert(`🎉 成功發佈 ${cls} 班 ${date} 的家課！`);
-        
-        // 發佈後，讓家課展示板自動切換過去顯示最新成果
-        hwDisplayDateFilter.value = date;
-        hwDisplayClassFilter.value = cls;
-        renderDailyHomeworkBoard();
-    });
-
-    // 監聽家課板專屬檢索工具列的變更
-    hwDisplayDateFilter.addEventListener('change', renderDailyHomeworkBoard);
-    hwDisplayClassFilter.addEventListener('change', renderDailyHomeworkBoard);
-
-    function renderDailyHomeworkBoard() {
-        const cls = hwDisplayClassFilter.value;
-        const date = hwDisplayDateFilter.value;
-        
-        if (!cls || !date) return; // 防錯機制
-
-        const hwList = dailyHomeworkDb[`${date}___${cls}`];
-        if (!hwList || hwList.length === 0) {
-            noHomeworkMessage.style.display = 'block';
-            homeworkDisplayList.style.display = 'none';
-            return;
-        }
-
-        noHomeworkMessage.style.display = 'none';
-        homeworkDisplayList.innerHTML = '';
-        hwList.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            homeworkDisplayList.appendChild(li);
-        });
-        homeworkDisplayList.style.display = 'block';
-    }
-
-    copyHomeworkBtn.addEventListener('click', function() {
-        const cls = hwDisplayClassFilter.value;
-        const date = hwDisplayDateFilter.value;
-        
-        if(!cls || !date) return alert('請先選擇日期與班別！');
-        const hwList = dailyHomeworkDb[`${date}___${cls}`];
-
-        if (!hwList || hwList.length === 0) return alert('沒有可以複製的家課內容！');
-
-        let text = `🏫 聖公會蔡功譜中學\n📚 ${cls} 班 每日家課表\n📅 日期：${date}\n\n`;
-        hwList.forEach(item => { text += `${item}\n`; });
-
-        navigator.clipboard.writeText(text).then(() => {
-            alert('📋 家課表已複製至剪貼簿！');
-        }).catch(err => {
-            alert('複製失敗，可能瀏覽器不支援，請手動複製。');
-        });
-    });
-
-    // ==========================================
-    // 📋 欠交記錄管理
-    // ==========================================
-    function autoCleanRecords() {
-        if (cleanPolicy.value === 'NEVER') return;
-        const limitDate = new Date();
-        limitDate.setDate(limitDate.getDate() - parseInt(cleanPolicy.value));
-        const origLen = records.length;
-        
-        records = records.filter(r => new Date(r.date) >= limitDate);
-        const delCount = origLen - records.length;
-        if (delCount > 0) {
-            localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            cleanedCountSpan.textCo
+                        <th style="width: 12%">登記日期</th>
+                        <th style="width: 10%">班別</th>
+                        <th style="width: 10%">學號</th>
+                        <th style="width: 15%">學生姓名</th>
+                        <th style="width: 33%">欠交項目與狀態</th>
+                        <th
