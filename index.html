@@ -227,7 +227,6 @@
             width: auto;
             padding: 6px 12px;
             font-size: 14px;
-            float: right;
         }
         .btn-copy:hover {
             background-color: #e08e0b;
@@ -238,7 +237,24 @@
             align-items: center;
             border-bottom: 1px dashed #ffe58f;
             padding-bottom: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        /* 獨立檢索區塊樣式 */
+        .hw-filter-bar {
+            display: flex;
+            gap: 15px;
+            background: #fffbe6;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ffe58f;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .hw-filter-bar .filter-group {
+            min-width: 150px;
+            margin: 0;
+            flex: unset;
         }
     </style>
 </head>
@@ -297,18 +313,28 @@
         </div>
     </div>
 
-    <!-- 📅 每日家課展示板 -->
+    <!-- 📅 每日家課展示板 (新增獨立檢索) -->
     <div class="card homework-display-card">
         <div class="homework-header">
             <h3 style="margin: 0; color: #b78103;">📅 每日家課（功課）展示板</h3>
-            <button id="copyHomeworkBtn" class="btn-copy">📋 一鍵複製家課</button>
+            <button id="copyHomeworkBtn" class="btn-copy">📋 一鍵複製</button>
         </div>
-        <div style="font-size: 15px; font-weight: bold; color: #666; margin-bottom: 10px;">
-            班別：<span id="hwDisplayClass" class="badge" style="background-color: #ffe58f; color: #b78103;">-</span> 
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            日期：<span id="hwDisplayDate" style="color: #333;">-</span>
+
+        <!-- 專屬檢索工具列 -->
+        <div class="hw-filter-bar">
+            <div class="filter-group">
+                <label for="hwDisplayDateFilter" style="color: #b78103;">📅 檢索日期：</label>
+                <input type="date" id="hwDisplayDateFilter" style="padding: 6px;">
+            </div>
+            <div class="filter-group">
+                <label for="hwDisplayClassFilter" style="color: #b78103;">🏫 檢索班別：</label>
+                <select id="hwDisplayClassFilter" style="padding: 6px;">
+                    <!-- JS 動態載入 -->
+                </select>
+            </div>
         </div>
-        <div id="noHomeworkMessage" class="no-data" style="color: #9e7403; background: none; padding: 10px;">此班級當天暫無發佈家課 👍</div>
+
+        <div id="noHomeworkMessage" class="no-data" style="color: #9e7403; background: none; padding: 10px;">此班級於該日期暫無家課 👍</div>
         <ol id="homeworkDisplayList" class="homework-list" style="display: none;"></ol>
     </div>
 
@@ -423,13 +449,12 @@
 </div>
 
 <script>
-    // 核心數據讀取
+    // 核心數據讀取 (防呆)
     let records = [];
     let studentRosters = {};
     let dailyHomeworkDb = {};
     let classList = [];
-
-    // 💡 容錯加載：即使 JSON 損壞也絕不卡死
+    
     function loadDataFromStorage() {
         try { records = JSON.parse(localStorage.getItem('homeworkRecords')) || []; } catch(e) { records = []; }
         try { studentRosters = JSON.parse(localStorage.getItem('studentRosters')) || {}; } catch(e) { studentRosters = {}; }
@@ -476,33 +501,32 @@
     const addClassBtn = document.getElementById('addClassBtn');
     const deleteClassBtn = document.getElementById('deleteClassBtn');
 
+    // 家課系統 DOM
     const dailyHomeworkForm = document.getElementById('dailyHomeworkForm');
     const homeworkDateInput = document.getElementById('homeworkDate');
     const homeworkClassSelect = document.getElementById('homeworkClassSelect');
     const homeworkContentInput = document.getElementById('homeworkContent');
-    const hwDisplayClass = document.getElementById('hwDisplayClass');
-    const hwDisplayDate = document.getElementById('hwDisplayDate');
+    const hwDisplayDateFilter = document.getElementById('hwDisplayDateFilter');
+    const hwDisplayClassFilter = document.getElementById('hwDisplayClassFilter');
     const noHomeworkMessage = document.getElementById('noHomeworkMessage');
     const homeworkDisplayList = document.getElementById('homeworkDisplayList');
     const copyHomeworkBtn = document.getElementById('copyHomeworkBtn');
 
-    // 🌟 一鍵活化修復按鈕監聽
     const forceResetBtn = document.getElementById('forceResetBtn');
 
     // 預設日期設定
     const today = new Date().toISOString().split('T')[0];
     if (recordDateInput) recordDateInput.value = today;
     if (homeworkDateInput) homeworkDateInput.value = today;
+    if (hwDisplayDateFilter) hwDisplayDateFilter.value = today; // 預設家課展示板日期
     if (cleanPolicy) cleanPolicy.value = localStorage.getItem('homeworkCleanPolicy') || "30";
 
     // ==========================================
-    // ⚡ 強制活化與修復（排除髒數據的核心代碼）
+    // ⚡ 一鍵活化修復
     // ==========================================
     forceResetBtn.addEventListener('click', function() {
-        if (confirm('確定要執行一鍵修復嗎？\n這將重設本地緩存並恢復 1A~3C 的初始乾淨結構（學生名單與記錄會重置，但保證按鈕功能 100% 恢復正常運作！）』')) {
-            localStorage.clear(); // 徹底清除瀏覽器中所有損壞的本地資料
-            
-            // 寫入全新初始資料
+        if (confirm('確定要執行一鍵修復嗎？\n這將重設本地緩存並恢復初始乾淨結構（保證按鈕功能 100% 恢復正常運作！）』')) {
+            localStorage.clear(); 
             classList = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C'];
             records = [];
             studentRosters = {};
@@ -517,8 +541,7 @@
             updateStudentDropdown();
             renderDailyHomeworkBoard();
             renderTable();
-
-            alert('🎉 系統已成功重設並重新活化！現在所有的按鈕與管理功能均已恢復暢通運作！');
+            alert('🎉 系統已成功重設並重新活化！');
         }
     });
 
@@ -539,12 +562,21 @@
         homeworkClassSelect.innerHTML = '<option value="" disabled selected>請選擇班別</option>' + optionsHtml;
         if (classList.includes(currentHwClass)) homeworkClassSelect.value = currentHwClass;
 
-        // 3. 篩選器的班別
+        // 3. 獨立：家課展示板的檢索班別
+        const currentHwDisplayClass = hwDisplayClassFilter.value;
+        hwDisplayClassFilter.innerHTML = classList.length === 0 ? '<option value="" disabled selected>無班別可選</option>' : optionsHtml;
+        if (classList.includes(currentHwDisplayClass)) {
+            hwDisplayClassFilter.value = currentHwDisplayClass;
+        } else if (classList.length > 0) {
+            hwDisplayClassFilter.value = classList[0]; // 預設選第一個班級
+        }
+
+        // 4. 篩選器的班別
         const currentFilterClass = classFilter.value;
         classFilter.innerHTML = '<option value="ALL">顯示所有班別</option>' + optionsHtml;
         if (currentFilterClass === 'ALL' || classList.includes(currentFilterClass)) classFilter.value = currentFilterClass;
 
-        // 4. 設定區塊的班別
+        // 5. 設定區塊的班別
         const currentRosterClass = rosterClassSelect.value;
         rosterClassSelect.innerHTML = classList.length === 0 ? '<option value="" disabled selected>請先新增班別</option>' : optionsHtml;
         if (classList.includes(currentRosterClass)) rosterClassSelect.value = currentRosterClass;
@@ -585,6 +617,7 @@
             renderClassDropdowns();
             loadRosterToTextarea();
             updateStudentDropdown();
+            renderDailyHomeworkBoard();
         }
     });
 
@@ -604,7 +637,6 @@
         localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
         alert(`成功儲存 ${cls} 班（共 ${list.length} 人）！`);
         
-        // 儲存後立即更新下拉選單
         studentClassInput.value = cls;
         updateStudentDropdown();
     });
@@ -629,7 +661,7 @@
     }
 
     // ==========================================
-    // 📅 家課發佈與展示
+    // 📅 家課發佈與展示 (完全獨立邏輯)
     // ==========================================
     dailyHomeworkForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -646,19 +678,21 @@
         homeworkContentInput.value = '';
         alert(`🎉 成功發佈 ${cls} 班 ${date} 的家課！`);
         
-        recordDateInput.value = date;
-        classFilter.value = cls;
+        // 發佈後，讓家課展示板自動切換過去顯示最新成果
+        hwDisplayDateFilter.value = date;
+        hwDisplayClassFilter.value = cls;
         renderDailyHomeworkBoard();
-        renderTable();
     });
 
-    function renderDailyHomeworkBoard() {
-        let cls = classFilter.value;
-        if (cls === 'ALL') cls = classList[0] || '-';
-        const date = recordDateInput.value || today;
+    // 監聽家課板專屬檢索工具列的變更
+    hwDisplayDateFilter.addEventListener('change', renderDailyHomeworkBoard);
+    hwDisplayClassFilter.addEventListener('change', renderDailyHomeworkBoard);
 
-        hwDisplayClass.textContent = cls;
-        hwDisplayDate.textContent = date;
+    function renderDailyHomeworkBoard() {
+        const cls = hwDisplayClassFilter.value;
+        const date = hwDisplayDateFilter.value;
+        
+        if (!cls || !date) return; // 防錯機制
 
         const hwList = dailyHomeworkDb[`${date}___${cls}`];
         if (!hwList || hwList.length === 0) {
@@ -678,8 +712,10 @@
     }
 
     copyHomeworkBtn.addEventListener('click', function() {
-        const cls = hwDisplayClass.textContent;
-        const date = hwDisplayDate.textContent;
+        const cls = hwDisplayClassFilter.value;
+        const date = hwDisplayDateFilter.value;
+        
+        if(!cls || !date) return alert('請先選擇日期與班別！');
         const hwList = dailyHomeworkDb[`${date}___${cls}`];
 
         if (!hwList || hwList.length === 0) return alert('沒有可以複製的家課內容！');
@@ -694,9 +730,6 @@
         });
     });
 
-    recordDateInput.addEventListener('change', renderDailyHomeworkBoard);
-    classFilter.addEventListener('change', renderDailyHomeworkBoard);
-
     // ==========================================
     // 📋 欠交記錄管理
     // ==========================================
@@ -710,170 +743,4 @@
         const delCount = origLen - records.length;
         if (delCount > 0) {
             localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            cleanedCountSpan.textContent = delCount;
-            cleanAlert.style.display = 'flex';
-            setTimeout(() => { cleanAlert.style.display = 'none'; }, 5000);
-        }
-    }
-
-    function getFilteredRecords() {
-        const cls = classFilter.value;
-        const q = nameSearch.value.trim().toLowerCase();
-        return records.filter(r => (cls === 'ALL' || r.className === cls) && r.name.toLowerCase().includes(q));
-    }
-
-    function renderTable() {
-        recordTableBody.innerHTML = '';
-        const filtered = getFilteredRecords();
-        if (filtered.length === 0) {
-            noDataMessage.style.display = 'block';
-            totalCountSpan.textContent = '找到 0 筆相關記錄';
-            exportBtn.style.display = 'none';
-            return;
-        }
-        noDataMessage.style.display = 'none';
-        exportBtn.style.display = 'inline-flex';
-        
-        let stats = classFilter.value !== 'ALL' ? `${classFilter.value} 班總計欠交：` : `總計欠交：`;
-        stats += `${filtered.length} 筆`;
-        totalCountSpan.textContent = stats;
-
-        const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
-        sorted.forEach(record => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${record.date}</td>
-                <td><span class="badge">${escapeHtml(record.className)}</span></td>
-                <td><strong>${escapeHtml(record.name)}</strong></td>
-                <td>${escapeHtml(record.item)}</td>
-                <td><button class="btn-delete" onclick="deleteRecord('${record.id}')">已補交 / 刪除</button></td>
-            `;
-            recordTableBody.appendChild(tr);
-        });
-    }
-
-    function escapeHtml(string) {
-        return String(string).replace(/[&<>"']/g, function (s) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
-        });
-    }
-
-    recordForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        records.push({
-            id: Date.now().toString(),
-            date: recordDateInput.value,
-            className: studentClassInput.value,
-            name: studentNameSelect.value,
-            item: homeworkItemInput.value.trim()
-        });
-        localStorage.setItem('homeworkRecords', JSON.stringify(records));
-        
-        studentNameSelect.value = '';
-        homeworkItemInput.value = '';
-        renderTable();
-    });
-
-    classFilter.addEventListener('change', renderTable);
-    nameSearch.addEventListener('input', renderTable);
-    cleanPolicy.addEventListener('change', () => {
-        localStorage.setItem('homeworkCleanPolicy', cleanPolicy.value);
-        autoCleanRecords();
-        renderTable();
-    });
-
-    window.deleteRecord = function(id) {
-        records = records.filter(r => r.id !== id);
-        localStorage.setItem('homeworkRecords', JSON.stringify(records));
-        renderTable();
-    };
-
-    clearAllBtn.addEventListener('click', () => {
-        if (confirm('確定要清除所有的欠交記錄嗎？此操作無法還原。')) {
-            records = [];
-            localStorage.setItem('homeworkRecords', JSON.stringify(records));
-            renderTable();
-        }
-    });
-
-    // ==========================================
-    // 📥 匯出與備份
-    // ==========================================
-    exportBtn.addEventListener('click', () => {
-        const filtered = getFilteredRecords();
-        if (filtered.length === 0) return;
-        let csv = "\uFEFF登記日期,班別,學生姓名,欠交項目\n";
-        filtered.forEach(r => {
-            csv += `${r.date},${r.className},"${r.name.replace(/"/g, '""')}","${r.item.replace(/"/g, '""')}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const suffix = classFilter.value === 'ALL' ? '所有班級' : `${classFilter.value}班`;
-        link.setAttribute("href", URL.createObjectURL(blob));
-        link.setAttribute("download", `欠交功課報表_${suffix}_${new Date().toISOString().split('T')[0]}.csv`);
-        link.click();
-    });
-
-    exportBackupBtn.addEventListener('click', () => {
-        const backup = {
-            classes: classList,
-            records: records,
-            studentRosters: studentRosters,
-            dailyHomeworkDb: dailyHomeworkDb,
-            policy: cleanPolicy.value,
-            backupTime: new Date().toLocaleString()
-        };
-        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-        const link = document.createElement("a");
-        link.setAttribute("href", URL.createObjectURL(blob));
-        link.setAttribute("download", `homework_backup_${new Date().toISOString().split('T')[0]}.json`);
-        link.click();
-    });
-
-    importBackupBtn.addEventListener('click', () => fileInput.click());
-
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            try {
-                const data = JSON.parse(evt.target.result);
-                if (data.records && data.studentRosters) {
-                    if (confirm(`確定導入備份嗎（備份時間：${data.backupTime || '未知'}）？這將覆蓋現有所有資料。`)) {
-                        records = data.records;
-                        studentRosters = data.studentRosters;
-                        if (data.classes) classList = data.classes;
-                        if (data.dailyHomeworkDb) dailyHomeworkDb = data.dailyHomeworkDb;
-                        if (data.policy) {
-                            cleanPolicy.value = data.policy;
-                            localStorage.setItem('homeworkCleanPolicy', data.policy);
-                        }
-                        localStorage.setItem('homeworkRecords', JSON.stringify(records));
-                        localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
-                        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
-                        localStorage.setItem('dailyHomeworkDb', JSON.stringify(dailyHomeworkDb));
-                        
-                        renderClassDropdowns();
-                        updateStudentDropdown();
-                        renderDailyHomeworkBoard();
-                        renderTable();
-                        alert('🎉 數據導入成功！');
-                    }
-                } else alert('❌ 導入失敗：非本系統備份格式。');
-            } catch (err) { alert('❌ 導入失敗：無法解析該備份檔案。'); }
-            fileInput.value = '';
-        };
-        reader.readAsText(file);
-    });
-
-    // 啟動初始化
-    renderClassDropdowns();
-    updateStudentDropdown();
-    autoCleanRecords();
-    renderDailyHomeworkBoard();
-    renderTable();
-</script>
-
-</body>
-</html>
+            cleanedCountSpan.textCo
