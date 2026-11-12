@@ -118,12 +118,6 @@
 </head>
 <body>
 
-<noscript>
-    <div style="color: red; text-align: center; padding: 20px; font-size: 20px;">
-        ⚠️ 您的瀏覽器未啟用 JavaScript，無法載入系統。請啟用後重新整理。
-    </div>
-</noscript>
-
 <div class="container">
     <header>
         <h1>🏫 聖公會蔡功譜中學</h1>
@@ -132,146 +126,16 @@
             <span id="cloudStatusDot" class="status-dot dot-yellow"></span>
             <span id="cloudStatusText">☁️ 正在連線至 Google 雲端...</span>
         </div>
-        <p>追蹤補交、家課發佈、大批次名單與雲端自動同步</p>
+        <p>跨裝置自動同步、家課發佈、欠交追蹤與一鍵備份</p>
     </header>
 
+    <!-- 一鍵活化修復按鈕 -->
     <div style="background-color: #e6f7ff; border: 1px solid #91d5ff; padding: 15px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
-        <span style="font-size: 15px; color: #1890ff; font-weight: bold;">⚠️ 網頁沒反應或卡住？</span>
-        <span style="font-size: 14px; color: #555;">如果您的網頁按鈕無反應，請點擊：</span>
+        <span style="font-size: 15px; color: #1890ff; font-weight: bold;">⚠️ 網頁功能沒有反應？</span>
+        <span style="font-size: 14px; color: #555;">請點擊右方按鈕，即可清除舊有的錯誤快取：</span>
         <button id="forceResetBtn" style="background-color: #1890ff; width: auto; padding: 6px 15px; font-size: 14px; margin-left: 10px;">⚡ 一鍵修復系統資料</button>
     </div>
 
     <div id="cleanAlert" class="clean-alert">
-        ⚠️ <strong>系統通知：</strong> 系統已自動清除 <span id="cleanedCount">0</span> 筆過期記錄！
-    </div>
+        ⚠️ <strong>系統通知：</strong> 系統已自動清除 <span id="cleanedCou
 
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
-        <button id="manualSyncBtn" class="btn-sync">🔄 立即讀取雲端</button>
-        <button id="toggleLeaderboardBtn" class="btn-toggle" style="background-color: var(--warning-color); color: #fff;">📊 查看欠交排行榜</button>
-        <button id="toggleRosterBtn" class="btn-toggle" style="background-color: #6c757d; color: #fff;">⚙️ 管理班別與名冊</button>
-    </div>
-
-    <!-- 📊 排行榜區塊 -->
-    <div id="leaderboardCard" class="card leaderboard-card">
-        <h3>🏆 學生欠交次數排行榜</h3>
-        <p style="font-size: 14px; color: #666;">系統會自動計算每位學生的欠交總次數，並依照<strong>「🔴 目前未交」</strong>次數由多到少進行排名。</p>
-        <div class="filter-section" style="background: #fff3cd; border: 1px solid #ffeeba;">
-            <div class="filter-group">
-                <label for="leaderboardClassFilter">🔍 篩選班別：</label>
-                <select id="leaderboardClassFilter"><option value="ALL">顯示全校總排行</option></select>
-            </div>
-            <button id="exportLeaderboardBtn" class="btn-export" style="margin-left: auto;">📥 匯出排行榜</button>
-        </div>
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 10%">排名</th>
-                        <th style="width: 12%">班別</th>
-                        <th style="width: 12%">學號</th>
-                        <th style="width: 20%">學生姓名</th>
-                        <th style="width: 15%; color: #c0392b;">🔴 目前未交</th>
-                        <th style="width: 15%; color: #27ae60;">🟢 已補交</th>
-                        <th style="width: 16%">總欠交記錄</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboardTableBody"></tbody>
-            </table>
-            <div id="noLeaderboardMessage" class="no-data">目前沒有任何欠交記錄 👍</div>
-        </div>
-    </div>
-
-    <!-- ⚙️ 班別與學生名單管理區塊 -->
-    <div id="rosterCard" class="card roster-card">
-        <h3>👥 班別與學生名冊管理</h3>
-        
-        <div class="roster-tabs">
-            <div id="tabSingle" class="roster-tab active">🏫 個別班級設定</div>
-            <div id="tabBatch" class="roster-tab">📋 全校大批次匯入</div>
-        </div>
-
-        <div id="singleClassSection">
-            <div class="manage-class-box">
-                <strong style="white-space: nowrap;">✨ 新增班別：</strong>
-                <input type="text" id="newClassInput" placeholder="例如：4A" style="width: 150px; padding: 6px;">
-                <button id="addClassBtn" style="width: auto; padding: 6px 15px; background: #28a745;">加入</button>
-            </div>
-            <p style="font-size: 14px; color: #666; margin-top: 10px;">💡 請使用<strong>「學號 + 空格 + 姓名」</strong>的格式。</p>
-            <div class="form-row">
-                <div class="form-group" style="flex: 1;">
-                    <label>選擇班別</label>
-                    <select id="rosterClassSelect"></select>
-                    <button id="deleteClassBtn" class="btn-delete" style="margin-top: 10px; width: 100%;">🗑️ 刪除此班別</button>
-                </div>
-                <div class="form-group" style="flex: 3;">
-                    <label>該班學生名單（每行一人）</label>
-                    <textarea id="rosterTextArea" placeholder="01 陳大文&#10;02 張小明"></textarea>
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                <button id="saveRosterBtn" style="width: auto; background-color: var(--primary-color);">💾 儲存並同步至雲端</button>
-                <button id="closeRosterBtn" style="width: auto; background-color: #6c757d;">收起設定</button>
-            </div>
-        </div>
-
-        <div id="batchClassSection" style="display: none;">
-            <p style="font-size: 14px; color: #333; background: #eef2f7; padding: 10px; border-radius: 4px; border-left: 4px solid var(--primary-color);">
-                💡 直接複製 Excel 總名冊貼上。<br>格式：<strong>「班別 學號 姓名」</strong>（系統會自動解析）。
-            </p>
-            <div class="form-group" style="margin-top: 10px;">
-                <label>📋 貼上全校總名單</label>
-                <textarea id="batchRosterTextArea" style="height: 200px;" placeholder="1A 01 陳大文&#10;1A 02 張小明&#10;1B 01 李美美"></textarea>
-            </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                <button id="saveBatchRosterBtn" style="width: auto; background-color: var(--success-color);">⚡ 立即解析並同步</button>
-                <button id="closeRosterBtn2" style="width: auto; background-color: #6c757d;">收起設定</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📅 獨立檢索的：每日家課展示板 -->
-    <div class="card homework-display-card">
-        <div class="homework-header">
-            <h3 style="margin: 0; color: #b78103;">📅 每日家課（功課）展示板</h3>
-            <button id="copyHomeworkBtn" class="btn-copy">📋 一鍵複製</button>
-        </div>
-        <div class="hw-filter-bar">
-            <div class="filter-group">
-                <label style="color: #b78103;">📅 日期：</label>
-                <input type="date" id="hwDisplayDateFilter" style="padding: 6px;">
-            </div>
-            <div class="filter-group">
-                <label style="color: #b78103;">🏫 班別：</label>
-                <select id="hwDisplayClassFilter" style="padding: 6px;"></select>
-            </div>
-        </div>
-        <div id="noHomeworkMessage" class="no-data" style="color: #9e7403; background: none; padding: 10px;">此班級於該日期暫無家課 👍</div>
-        <ol id="homeworkDisplayList" class="homework-list" style="display: none;"></ol>
-    </div>
-
-    <!-- 📝 發佈每日家課表單 -->
-    <div class="card" style="border-top: 4px solid var(--warning-color);">
-        <h3 style="color: #d48806;">📝 發佈每日家課</h3>
-        <form id="dailyHomeworkForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>發佈日期</label>
-                    <input type="date" id="homeworkDate" required>
-                </div>
-                <div class="form-group">
-                    <label>發佈班別</label>
-                    <select id="homeworkClassSelect" required><option value="" disabled selected>請選擇</option></select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>家課內容（支援換行）</label>
-                <textarea id="homeworkContent" placeholder="例如：&#10;1. 中文工作紙 (三)&#10;2. 數學書 P.12 習題" required></textarea>
-            </div>
-            <button type="submit" style="background-color: var(--warning-color);">💾 發佈並同步至雲端</button>
-        </form>
-    </div>
-
-    <!-- ➕ 輸入欠交表單 -->
-    <div class="card">
-        <h3>➕ 新增欠交記錄</h3>
-        <form id="re
