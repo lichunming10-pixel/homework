@@ -340,13 +340,20 @@
         <p>跨裝置自動同步、家課發佈、欠交追蹤與一鍵備份</p>
     </header>
 
+    <!-- 一鍵活化修復按鈕 -->
+    <div style="background-color: #e6f7ff; border: 1px solid #91d5ff; padding: 15px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
+        <span style="font-size: 15px; color: #1890ff; font-weight: bold;">⚠️ 網頁沒反應或卡住？</span>
+        <span style="font-size: 14px; color: #555;">如果您的網頁按鈕無反應，請點擊：</span>
+        <button id="forceResetBtn" style="background-color: #1890ff; width: auto; padding: 6px 15px; font-size: 14px; margin-left: 10px;">⚡ 一鍵修復系統資料</button>
+    </div>
+
     <div id="cleanAlert" class="clean-alert">
         ⚠️ <strong>系統通知：</strong> 系統已自動清除 <span id="cleanedCount">0</span> 筆過期記錄！
     </div>
 
     <!-- 頂部功能切換按鈕區塊 -->
     <div style="display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 15px; flex-wrap: wrap;">
-        <button id="manualSyncBtn" class="btn-sync">🔄 立即同步雲端</button>
+        <button id="manualSyncBtn" class="btn-sync">🔄 立即讀取雲端</button>
         <button id="toggleLeaderboardBtn" class="btn-toggle" style="background-color: var(--warning-color); color: #fff;">📊 查看欠交排行榜</button>
         <button id="toggleRosterBtn" class="btn-toggle" style="background-color: #6c757d; color: #fff;">⚙️ 管理班別與名冊</button>
     </div>
@@ -423,7 +430,7 @@
                 <textarea id="batchRosterTextArea" style="height: 200px;" placeholder="1A 01 陳大文&#10;1A 02 張小明&#10;1B 01 李美美"></textarea>
             </div>
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                <button id="saveBatchRosterBtn" style="width: auto; background-color: var(--success-color);">⚡ 立即解析並同步至雲端</button>
+                <button id="saveBatchRosterBtn" style="width: auto; background-color: var(--success-color);">⚡ 立即解析並同步</button>
                 <button id="closeRosterBtn2" style="width: auto; background-color: #6c757d;">收起設定</button>
             </div>
         </div>
@@ -467,7 +474,7 @@
                 <label>家課內容（支援換行）</label>
                 <textarea id="homeworkContent" placeholder="例如：&#10;1. 中文工作紙 (三)&#10;2. 數學書 P.12 習題" required></textarea>
             </div>
-            <button type="submit" style="background-color: var(--warning-color);">💾 發佈並同步至 Google 雲端</button>
+            <button type="submit" style="background-color: var(--warning-color);">💾 發佈並同步至雲端</button>
         </form>
     </div>
 
@@ -495,7 +502,7 @@
                     <input type="text" id="homeworkItem" placeholder="例如：中文工作紙 (三)" required>
                 </div>
             </div>
-            <button type="submit">儲存並同步至 Google 雲端</button>
+            <button type="submit">儲存並同步至雲端</button>
         </form>
     </div>
 
@@ -569,9 +576,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ==========================================
-    // 🌐 聖公會蔡功譜中學專屬 Google Apps Script API
+    // 🌐 聖公會蔡功譜中學專屬 正確 Google Apps Script API
     // ==========================================
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/tkp.edu.hk/s/AKfycbzxs2LD3VDSLLxqz9Z3dH28fSYT8dR_PMBGXxNcgu2EB2Yuiae97K6wH1L0TVIFeptpuA/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3Pc230sM4Z7D6H2Wo931ckvOScYPR-jXR1I2GTeEgPkp95aVAOl8jYwTmsTRRHNro/exec";
 
     // 核心數據
     let records = [];
@@ -610,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ==========================================
-    // ☁️ Google 雲端讀取與寫入函數
+    // ☁️ Google 雲端寫入與讀取
     // ==========================================
     async function fetchFromGoogleCloud() {
         if (!GOOGLE_SCRIPT_URL) return;
@@ -636,4 +643,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderTable();
                 updateCloudStatus('online', '🟢 已同步 Google 雲端最新數據');
             } else {
-                updateCloudStatus('online', '🟢 雲端就緒 (目前為空，歡迎新增)
+                updateCloudStatus('online', '🟢 雲端就緒 (目前為空，歡迎新增)');
+            }
+        } catch (err) {
+            console.warn('雲端載入失敗，使用本地儲存:', err);
+            updateCloudStatus('offline', '🔴 雲端連線失敗 (目前使用本地儲存)');
+        }
+    }
+
+    async function syncToGoogleCloud() {
+        if (!GOOGLE_SCRIPT_URL) return;
+        updateCloudStatus('syncing', '🔄 正在上傳至 Google 雲端...');
+
+        const payload = {
+            classes: classList,
+            records: records,
+            studentRosters: studentRosters,
+            dailyHomeworkDb: dailyHomeworkDb,
+            updatedAt: new Date().toISOString()
+        };
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            updateCloudStatus('online', '🟢 已儲存並同步至 Google 雲端');
+        } catch (err) {
+            console.error('上傳至 Google 雲端失敗:', err);
+            updateCloudStatus('offline', '⚠️ 上傳失敗，資料已保留在本地');
+        }
+    }
+
+    function saveAllAndSync() {
+        localStorage.setItem('homeworkRecords', JSON.stringify(records));
+        localStorage.setItem('studentRosters', JSON.stringify(studentRosters));
+        localStorage.setItem('dailyHomeworkDb', JSON.stringify(dailyHomeworkDb));
+        localStorage.setItem('homeworkClasses', JSON.stringify(classList));
+        syncToGoogleCloud();
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    if (el('recordDate')) el('recordDate').value = today;
+    if (el('homeworkDate')) el('homeworkDate').value = today;
+    if (el('hwDisplayDateFilter')) el('hwDisplayDateFilter').value = today;
+    if (el('cleanPolicy')) el('cleanPolicy').value = localStorage.getItem('homeworkCleanPolicy') || "30";
+    if (el('sortOrder')) el('sortOrder').valu
+
